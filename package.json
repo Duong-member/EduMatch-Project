@@ -1,0 +1,14 @@
+{
+  "name": "edumatch-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "docker-compose up --build",
+    "stop": "docker-compose down",
+    "install:all": "pnpm install",
+    "build": "pnpm -r build"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
