@@ -9,6 +9,24 @@
     "build": "pnpm -r build"
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "@types/node": "^24.9.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MinhNguyen0496/EduMath-Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MinhNguyen0496/EduMath-Project/issues"
+  },
+  "homepage": "https://github.com/MinhNguyen0496/EduMath-Project#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3"
   }
 }
