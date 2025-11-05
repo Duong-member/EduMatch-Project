@@ -1,0 +1,8 @@
+# Ignore build và dependencies
+node_modules/
+dist/
+.env
+*.log
+
+# Ignore dữ liệu docker
+mysql-data/
