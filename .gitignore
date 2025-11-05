@@ -1,0 +1,7 @@
+# Ignore build và dependencies
+node_modules/
+dist/
+.env
+*.log
+
+
