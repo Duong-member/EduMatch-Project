@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # 1. Dịch vụ Database (MySQL)
+  mysql-db:
+    image: mysql:8.0
+    container_name: edumatch-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 
+      MYSQL_DATABASE: edumathdb 
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 01628886550
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  # 2. Dịch vụ Backend (User Service) - ĐÃ CẬP NHẬT
+  user-service:
+    container_name: edumatch-user-service
+    build:
+      context: ./services/user-service 
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8001:8001" 
+    environment:
+      # Thêm các biến này để mysql2 kết nối
+      MYSQL_HOST: mysql-db       # Tên của service CSDL
+      MYSQL_USER: user           # Giống ở trên
+      MYSQL_PASSWORD: password   # Giống ở trên
+      MYSQL_DB: edumatch_users_db # Giống ở trên
+      MYSQL_PORT: 3306
+      PORT: 8001
+    depends_on:
+      - mysql-db 
+
+
+  # 3. Dịch vụ Gateway (Cổng vào) - Tạm dùng Nginx
+  api-gateway:
+    container_name: edumatch-gateway
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "80:80" # Cổng chính 80 của hệ thống
+    depends_on:
+      - user-service # Phụ thuộc vào các service nó điều phối
+
+  # 4. Dịch vụ Frontend (React)
+  web-react:
+    container_name: edumatch-web
+    build:
+      context: ./apps/web-react
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-gateway
+
+volumes:
+  mysql-data:
