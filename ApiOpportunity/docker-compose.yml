@@ -7,10 +7,10 @@ services:
     container_name: edumatch-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 
-      MYSQL_DATABASE: edumathdb 
-      MYSQL_USER: root
-      MYSQL_PASSWORD: 01628886550
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: edumatch_users_db 
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
     ports:
       - "3307:3306"
     volumes:
