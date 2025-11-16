@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # 1. Dịch vụ Backend (App Node.js của bạn)
+  app:
+    container_name: edumath-app
+    build: .  # Lấy Dockerfile ở thư mục hiện tại (thư mục gốc)
+    restart: always
+    ports:
+      - "3000:3000" # Ánh xạ cổng 3000 của máy bạn vào cổng 3000 của container
+    environment:
+      # Cung cấp biến môi trường cho app của bạn
+      # Những biến này sẽ GHI ĐÈ lên file .env
+      DB_HOST: db          # Tên của service database bên dưới
+      DB_PORT: 3306        # Luôn là 3306 (cổng nội bộ của Docker)
+      DB_USER: root
+      DB_PASSWORD: ${MYSQL_PASSWORD} # Lấy từ file .env bên ngoài
+      DB_NAME: ${MYSQL_DATABASE}     # Lấy từ file .env bên ngoài
+      PORT: 3000           # Cổng server chạy bên TRONG container
+    depends_on:
+      - db # Khởi động app SAU KHI khởi động db
+
+  # 2. Dịch vụ Database (MySQL)
+  db:
+    image: mysql:8.0
+    container_name: edumath-db
+    restart: always
+    environment:
+      # Tạo database khi container khởi động
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "3307:3306" # Ánh xạ cổng 3307 của máy bạn vào cổng 3306 của container
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data: # Tạo một volume để lưu dữ liệu database
