@@ -35,6 +35,26 @@ services:
     depends_on:
       - mysql-db
 
+  # 2.5 Dịch vụ Backend (Application Service)
+  application-service:
+    container_name: edumatch-application-service
+    build:
+      context: ./services/application-service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "4002:4002"
+    environment:
+      # Kết nối tới database riêng cho Application Service
+      MYSQL_HOST: mysql-db         # Có thể dùng chung MySQL instance
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DB: edumatch_applications_db  # DB riêng trong cùng MySQL container
+      MYSQL_PORT: 3306
+      PORT: 4002
+    depends_on:
+      - mysql-db
+
 
   # 3. Dịch vụ Gateway (Cổng vào) - Tạm dùng Nginx
   api-gateway:

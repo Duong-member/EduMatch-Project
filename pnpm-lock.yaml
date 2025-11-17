@@ -96,6 +96,9 @@ importers:
 
   services/application-service:
     dependencies:
+      cors:
+        specifier: ^2.8.5
+        version: 2.8.5
       express:
         specifier: ^4.18.2
         version: 4.21.2
@@ -103,6 +106,9 @@ importers:
         specifier: ^3.6.0
         version: 3.15.3
     devDependencies:
+      '@types/cors':
+        specifier: ^2.8.19
+        version: 2.8.19
       '@types/express':
         specifier: ^4.17.17
         version: 4.17.24
@@ -2606,13 +2612,13 @@ snapshots:
 
   '@types/cors@2.8.19':
     dependencies:
-      '@types/node': 20.19.23
+      '@types/node': 24.9.1
 
   '@types/estree@1.0.8': {}
 
   '@types/express-serve-static-core@4.19.7':
     dependencies:
-      '@types/node': 20.19.23
+      '@types/node': 24.9.1
       '@types/qs': 6.14.0
       '@types/range-parser': 1.2.7
       '@types/send': 1.2.1
@@ -2677,7 +2683,7 @@ snapshots:
 
   '@types/send@1.2.1':
     dependencies:
-      '@types/node': 20.19.23
+      '@types/node': 24.9.1
 
   '@types/serve-static@1.15.10':
     dependencies:
@@ -3078,7 +3084,7 @@ snapshots:
   engine.io@6.6.4:
     dependencies:
       '@types/cors': 2.8.19
-      '@types/node': 20.19.23
+      '@types/node': 24.9.1
       accepts: 1.3.8
       base64id: 2.0.0
       cookie: 0.7.2
