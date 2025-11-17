@@ -1,5 +1,7 @@
 # Bỏ qua thư mục node_modules ở máy thật
-node_modules
+node_modules/
+
+.env
 
 # Bỏ qua thư mục build (sản phẩm build)
-dist
+dist/
