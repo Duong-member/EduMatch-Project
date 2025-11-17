@@ -1,0 +1,11 @@
+# Ignore build và dependencies
+node_modules/
+dist/
+.env
+*.log
+.DS_Store
+
+# Prisma
+prisma/migrations/
+
+

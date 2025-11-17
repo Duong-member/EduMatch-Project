@@ -4,12 +4,14 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL") // Sẽ lấy từ Docker
+  url      = env("DATABASE_URL")
 }
 
-// Model mẫu
 model User {
-  id    String @id @default(uuid())
-  email String @unique
-  name  String?
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      String
+  name      String?
+  createdAt DateTime @default(now())
 }

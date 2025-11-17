@@ -1,14 +1,14 @@
 version: '3.8'
 
 services:
-  # 1. Dịch vụ Database (MySQL)
+ # 1. Dịch vụ Database (MySQL)
   mysql-db:
     image: mysql:8.0
     container_name: edumatch-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: edumatch_users_db 
+      MYSQL_ROOT_PASSWORD: Duong18122005!
+      MYSQL_DATABASE: edumathdb
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:
@@ -16,25 +16,44 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
 
-  # 2. Dịch vụ Backend (User Service) - ĐÃ CẬP NHẬT
+  # 2. Dịch vụ Backend (User Service) 
   user-service:
     container_name: edumatch-user-service
     build:
-      context: ./services/user-service 
-      dockerfile: Dockerfile
+      context: ./services/user-service
+      dockerfile: Dockerfile.user-service
     restart: always
     ports:
-      - "8001:8001" 
+      - "8001:8001"
     environment:
-      # Thêm các biến này để mysql2 kết nối
-      MYSQL_HOST: mysql-db       # Tên của service CSDL
-      MYSQL_USER: user           # Giống ở trên
-      MYSQL_PASSWORD: password   # Giống ở trên
-      MYSQL_DB: edumatch_users_db # Giống ở trên
+      MYSQL_HOST: mysql-db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: Duong18122005!
+      MYSQL_DB: edumathdb
       MYSQL_PORT: 3306
       PORT: 8001
     depends_on:
-      - mysql-db 
+      - mysql-db
+
+  # 2.5 Dịch vụ Backend (Application Service)
+  application-service:
+    container_name: edumatch-application-service
+    build:
+      context: ./services/application-service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "4002:4002"
+    environment:
+      # Kết nối tới database riêng cho Application Service
+      MYSQL_HOST: mysql-db         # Có thể dùng chung MySQL instance
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DB: edumatch_applications_db  # DB riêng trong cùng MySQL container
+      MYSQL_PORT: 3306
+      PORT: 4002
+    depends_on:
+      - mysql-db
 
 
   # 3. Dịch vụ Gateway (Cổng vào) - Tạm dùng Nginx
