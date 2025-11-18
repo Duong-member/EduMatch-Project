@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Socket test</title>
+  </head>
+  <body>
+    <h1>Socket test</h1>
+    <ul id="log"></ul>
+
+    <!-- Socket.IO client -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+      const logEl = document.getElementById('log');
+
+      function log(msg) {
+        const li = document.createElement('li');
+        li.textContent = msg;
+        logEl.appendChild(li);
+      }
+
+      // Giả sử test cho userId = 1
+      const userId = 1;
+
+      const socket = io('http://localhost:8090', {
+        transports: ['websocket'],
+        query: { userId }
+      });
+
+      socket.on('connect', () => {
+        log('Connected to socket server (id: ' + socket.id + ')');
+        console.log('Connected', socket.id);
+      });
+
+      socket.on('connect_error', (err) => {
+        log('Connect error: ' + err.message);
+        console.error(err);
+      });
+
+      socket.on('notification', (payload) => {
+        log('Notification: ' + JSON.stringify(payload));
+        console.log('Notification received:', payload);
+      });
+    </script>
+  </body>
+</html>
