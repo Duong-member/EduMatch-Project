@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  // Sẽ kết nối đến CSDL edumatch_users_db
+  url      = env("DATABASE_URL") 
+}
+
+model Opportunity {
+  opportunity_id Int       @id @default(autoincrement())
+  title          String    @db.VarChar(255)
+  description    String?   @db.Text
+  deadline       DateTime? @db.Date
+  category       String?   @db.VarChar(100)
+  professor_id   String?   @db.VarChar(255)
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+
+  @@map("opportunities")
+}
+model MatchingResult {
+  matching_id    Int       @id @default(autoincrement())
+  application_id Int
+  matched_date   DateTime? @default(now())
+  score          Decimal?  @db.Decimal(5, 2) // Hoặc Int nếu bạn muốn đơn giản
+  eligibility    String?   @db.Text // Ví dụ: "gpa:3.5,major:cs"
+  @@map("matchingresult") // Map đúng tên bảng mà Python đang gọi
+}
