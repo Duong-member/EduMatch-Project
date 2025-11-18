@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '../generated/client';
 import { User } from "../models/User";
 
 const prisma = new PrismaClient();
@@ -18,6 +18,11 @@ export class UserRepository {
   async findByEmail(email: string) {
     return prisma.user.findUnique({
       where: { email },
+    });
+  }
+  async findById(id: string) { // Nhớ là string uuid nhé
+    return prisma.user.findUnique({
+      where: { id },
     });
   }
 }

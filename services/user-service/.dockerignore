@@ -2,6 +2,6 @@
 node_modules/
 
 .env
-
+src/generated
 # Bỏ qua thư mục build (sản phẩm build)
 dist/

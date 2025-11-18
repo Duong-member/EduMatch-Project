@@ -28,4 +28,12 @@ export class UserController {
     return res.status(401).json({ error: err.message });
   }
 };
+getById = async (req: Request, res: Response) => {
+    try {
+      const user = await this.userService.getUserById(req.params.id);
+      res.json(user);
+    } catch (err: any) {
+      res.status(404).json({ error: err.message });
+    }
+  };
 }

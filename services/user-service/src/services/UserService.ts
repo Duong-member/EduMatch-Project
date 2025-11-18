@@ -42,4 +42,11 @@ export class UserService {
       token,
     };
   }
+  async getUserById(id: string) {
+    const user = await this.userRepo.findById(id);
+    if (!user) throw new Error("Người dùng không tồn tại");
+    // Ẩn mật khẩu trước khi trả về
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  }
 }

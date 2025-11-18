@@ -1,7 +1,9 @@
 # =======================
 # Stage 1: Builder
 # =======================
-FROM node:18-alpine AS builder
+FROM node:18-slim AS builder
+# Cài đặt đầy đủ thư viện cần thiết cho Prisma
+RUN apt-get update -y && apt-get install -y openssl ca-certificates procps
 WORKDIR /app
 
 RUN npm install -g pnpm
@@ -21,10 +23,10 @@ RUN pnpm run build
 # =======================
 # Stage 2: Production
 # =======================
-FROM node:18-alpine
+FROM node:18-slim
+# Cài đặt đầy đủ thư viện cần thiết cho Prisma
+RUN apt-get update -y && apt-get install -y openssl ca-certificates procps
 WORKDIR /app
-
-COPY .env .env
 
 RUN npm install -g pnpm
 
@@ -36,7 +38,7 @@ COPY --from=builder /app/node_modules ./node_modules
 
 # ✅ Copy schema để dùng prisma client runtime
 COPY --from=builder /app/prisma ./prisma
-
+COPY --from=builder /app/src/generated ./dist/generated
 COPY package.json .
 
 EXPOSE 8001
