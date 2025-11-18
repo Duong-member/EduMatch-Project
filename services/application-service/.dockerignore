@@ -4,3 +4,4 @@ Dockerfile
 pnpm-lock.yaml
 .git
 .gitignore
+src/generated/client

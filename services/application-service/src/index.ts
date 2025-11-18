@@ -3,7 +3,7 @@
 // ======================================================
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import { dbPool } from './db'; // ✅ Import từ file db.ts
+import { prisma } from './db/prisma'; // ✅ THÊM: (Tùy chọn) Import prisma nếu bạn muốn kiểm tra kết nối
 import applicationRoutes from './routes/application.routes';
 
 // ======================================================
@@ -48,11 +48,10 @@ app.listen(port, async () => {
 
   try {
     // Kiểm tra kết nối MySQL
-    const [rows] = await dbPool.query('SELECT NOW() AS now');
-    console.log('[Application-Service] ✅ Đã kết nối MySQL thành công:', rows);
+    await prisma.$connect();
+    console.log('[Application-Service] ✅ Đã kết nối MySQL (Prisma) thành công:');
   } catch (error) {
-    console.error('[Application-Service] ❌ Lỗi kết nối MySQL:', error);
+    console.error('[Application-Service] ❌ Lỗi kết nối MySQL (Prisma):', error);
   }
 });
-
-export { dbPool };
+export { prisma };
