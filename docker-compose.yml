@@ -1,43 +1,113 @@
-version: '3.8'
+
 
 services:
-  # 1. Dịch vụ Database (MySQL)
+ # 1. Dịch vụ Database (MySQL)
   mysql-db:
     image: mysql:8.0
     container_name: edumatch-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: edumatch_users_db 
+      MYSQL_ROOT_PASSWORD: Duong18122005!
+      # Xóa MYSQL_DATABASE, vì init.sql sẽ quản lý
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:
       - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+      # Thêm dòng này để chạy script tạo 3 CSDL
+      - ./services/mysql-init:/docker-entrypoint-initdb.d/init.sql
 
-  # 2. Dịch vụ Backend (User Service) - ĐÃ CẬP NHẬT
+  # 2. Dịch vụ Backend (User Service) 
   user-service:
     container_name: edumatch-user-service
     build:
-      context: ./services/user-service 
+      context: ./services/user-service
+      dockerfile: Dockerfile.user-service
+    restart: always
+    ports:
+      - "8001:8001"
+    environment:
+      # Dùng DATABASE_URL cho Prisma
+      DATABASE_URL: "mysql://user:password@mysql-db:3306/edumathdb"
+      PORT: 8001
+      JWT_SECRET: supersecret123456 
+    depends_on:
+      - mysql-db
+    # Tự động "xây" CSDL (tạo bảng) khi khởi động
+    command: >
+      sh -c "pnpm exec prisma db push --accept-data-loss &&
+             node dist/index.js"
+
+  # 3. Dịch vụ Backend (Application Service)
+  application-service:
+    container_name: edumatch-application-service
+    build:
+      context: ./services/application-service
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "8001:8001" 
+      - "4002:4002"
     environment:
-      # Thêm các biến này để mysql2 kết nối
-      MYSQL_HOST: mysql-db       # Tên của service CSDL
-      MYSQL_USER: user           # Giống ở trên
-      MYSQL_PASSWORD: password   # Giống ở trên
-      MYSQL_DB: edumatch_users_db # Giống ở trên
-      MYSQL_PORT: 3306
-      PORT: 8001
+      # Dùng DATABASE_URL cho Prisma
+      DATABASE_URL: "mysql://user:password@mysql-db:3306/edumatch_applications_db"
+      PORT: 4002
+      JWT_SECRET: supersecret123456
     depends_on:
-      - mysql-db 
+      - mysql-db
+    # Tự động "xây" CSDL (tạo bảng) khi khởi động
+    command: >
+      sh -c "pnpm exec prisma db push --accept-data-loss &&
+             node dist/index.js"
 
+  # 4. Dịch vụ Backend (Opportunity Service)
+  opportunity-service:
+    container_name: edumatch-opportunity
+    build:
+      context: ./services/opportunity-service
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      # Dùng DATABASE_URL cho Prisma
+      DATABASE_URL: "mysql://user:password@mysql-db:3306/edumatch_users_db"
+      JWT_SECRET: supersecret123456
+      PORT: 3000
+    ports:
+      - "8082:3000"
+    depends_on:
+      - mysql-db
+    # Tự động "xây" CSDL (tạo bảng) khi khởi động
+    command: >
+      sh -c "pnpm exec prisma db push --accept-data-loss &&
+             node dist/index.js"
 
-  # 3. Dịch vụ Gateway (Cổng vào) - Tạm dùng Nginx
+  # 5. Dịch vụ Backend (Matching Service - Python)
+  matching-service:
+    container_name: edumatch-matching
+    build:
+      context: ./services/matching-service/app
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      # Service Python này đọc biến riêng lẻ
+      MYSQL_HOST: mysql-db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DB: edumatch_users_db # Giả sử nó ghi kết quả vào CSDL của opportunity
+      MYSQL_PORT: 3306
+      # URLs của các service khác
+      USER_SERVICE_URL: http://user-service:8001
+      OPPORTUNITY_SERVICE_URL: http://opportunity-service:3000
+      APPLICATION_SERVICE_URL: http://application-service:4002
+    ports:
+      - "8080:8080" 
+    depends_on:
+      - mysql-db
+      - user-service
+      - application-service
+      - opportunity-service
+
+  # 6. Dịch vụ Gateway (Cổng vào)
   api-gateway:
     container_name: edumatch-gateway
     build:
@@ -45,11 +115,15 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "80:80" # Cổng chính 80 của hệ thống
+      - "80:80"
     depends_on:
-      - user-service # Phụ thuộc vào các service nó điều phối
+      - user-service
+      - application-service
+      - opportunity-service
+      - matching-service
+      # - web-react
 
-  # 4. Dịch vụ Frontend (React)
+  # 7. Dịch vụ Frontend (React)
   web-react:
     container_name: edumatch-web
     build:
@@ -60,27 +134,8 @@ services:
       - "3000:3000"
     depends_on:
       - api-gateway
- #5. oppor
-  opportunity-service:
-    container_name: edumatch-opportunity
-    build:
-      context: ./services/opportunity-service
-      dockerfile: Dockerfile
-    restart: always
-    environment:
-      DB_HOST: mysql-db          # tên service MySQL trong compose
-      DB_PORT: 3306
-      DB_USER: user
-      DB_PASS: password
-      DB_NAME: edumatch_users_db
-      JWT_SECRET: edumatch_users_db_secret_2025
-      PORT: 3000
-    ports:
-      - "8082:3000"              # host 8082 -> container 3000
-    depends_on:
-      - mysql-db
-#6. notify
 
+#6. notify
   notification-service:
     container_name: edumatch-notification-service
     build:
@@ -91,5 +146,7 @@ services:
       - "8083:8090"   # HOST:CONTAINER
     environment:
       - PORT=8090
+      
 volumes:
   mysql-data:
+
