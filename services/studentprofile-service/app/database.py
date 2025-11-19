@@ -51,7 +51,7 @@ class Student(Base):
     gpa = Column(DECIMAL(3, 2))
     skills = Column(Text)
     preferences = Column(Text)
-    #date_of_birth = Column(Date, nullable=True) 
+    date_of_birth = Column(Date, nullable=True) 
     
     # Mối quan hệ với Document (1:N)
     documents = relationship("Document", back_populates="owner")
