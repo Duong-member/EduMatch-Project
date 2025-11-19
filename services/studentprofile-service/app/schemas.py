@@ -20,7 +20,7 @@ class StudentProfileBase(BaseModel):
     gpa: float = Field(..., ge=0.0, le=4.0)
     skills: str 
     preferences: Optional[str] = None
-    #date_of_birth: Optional[date] = None 
+    date_of_birth: Optional[date] = None 
     
     class Config:
         orm_mode = True

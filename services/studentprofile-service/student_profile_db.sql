@@ -23,8 +23,9 @@ CREATE TABLE `student` (
   `full_name` VARCHAR(100) DEFAULT NULL,
   `major` VARCHAR(100) DEFAULT NULL,
   `gpa` DECIMAL(3,2) DEFAULT NULL, -- Float trong sơ đồ, dùng DECIMAL(3,2) trong MySQL
-  `skills` TEXT, -- 
+  `skills` TEXT, 
   `preferences` TEXT,
+  `date_of_birth` DATE DEFAULT NULL, 
   PRIMARY KEY (`student_id`),
   -- Khóa ngoại (FK) trỏ về UserAccount (1-1 relationship)
   CONSTRAINT `fk_student_user` FOREIGN KEY (`student_id`) REFERENCES `useraccount` (`user_id`)
@@ -44,3 +45,4 @@ CREATE TABLE `document` (
   -- Khóa ngoại (FK) trỏ về Student (Mối quan hệ 1-N)
   CONSTRAINT `fk_document_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+

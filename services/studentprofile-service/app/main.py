@@ -79,7 +79,7 @@ def update_student_profile(
     student.gpa = profile_data.gpa
     student.skills = profile_data.skills
     student.preferences = profile_data.preferences
-    #student.date_of_birth = profile_data.date_of_birth
+    student.date_of_birth = profile_data.date_of_birth
     
     db.commit()
     db.refresh(student)
