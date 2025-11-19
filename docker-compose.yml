@@ -135,18 +135,5 @@ services:
     depends_on:
       - api-gateway
 
- #6. notify
-
-  notification-service:
-    container_name: edumatch-notification-service
-    build:
-      context: ./services/notification-service
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - "8083:8090"   # HOST:CONTAINER
-    environment:
-      - PORT=8090
-
 volumes:
   mysql-data:
