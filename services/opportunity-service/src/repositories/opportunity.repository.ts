@@ -71,4 +71,8 @@ export class OpportunityRepository {
     });
     return result.count > 0; // Trả về true nếu xóa thành công
   }
+// ✅ THÊM: Đếm tổng số cơ hội
+  async count() {
+    return prisma.opportunity.count();
+  }
 }

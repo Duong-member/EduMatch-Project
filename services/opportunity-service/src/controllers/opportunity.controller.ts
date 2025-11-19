@@ -100,4 +100,13 @@ export class OpportunityController {
       res.status(500).json({ message: 'Lỗi server', error: err.message });
     }
   };
+// GET /count
+  count = async (req: Request, res: Response) => {
+    try {
+      const count = await this.oppService.countOpportunities();
+      res.json({ count });
+    } catch (err: any) {
+      res.status(500).json({ message: 'Lỗi server', error: err.message });
+    }
+  };
 }

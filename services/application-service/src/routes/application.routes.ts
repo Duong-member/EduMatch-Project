@@ -13,6 +13,7 @@ const controller = new ApplicationController(service);
 
 // Gắn routes
 router.post('/', controller.createApplication);
+router.get('/count', controller.count);
 router.get('/:id', controller.getApplication);
 router.put('/:id/status', controller.updateStatus);
 // (Thêm các routes khác nếu cần, ví dụ: GET /)

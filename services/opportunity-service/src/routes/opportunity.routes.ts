@@ -15,6 +15,7 @@ const controller = new OpportunityController(service);
 // Định tuyến các API
 // (Ánh xạ từ file opportunities.js cũ)
 router.post('/', auth, isProfessor, controller.create);
+router.get('/count', controller.count);
 router.get('/', controller.search);
 router.get('/my', auth, isProfessor, controller.getMyOpportunities);
 router.get('/:id', controller.getById);

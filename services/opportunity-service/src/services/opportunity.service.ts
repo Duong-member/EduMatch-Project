@@ -61,4 +61,7 @@ export class OpportunityService {
     if (!success) throw new Error('Không tìm thấy cơ hội hoặc không có quyền');
     return true;
   }
+async countOpportunities() {
+    return this.oppRepo.count();
+  }
 }
