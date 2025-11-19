@@ -16,7 +16,7 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       # Thêm dòng này để chạy script tạo 3 CSDL
-      - ./services/mysql-init:/docker-entrypoint-initdb.d/init.sql
+      - ./services/mysql-init/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   # 2. Dịch vụ Backend (User Service) 
   user-service:
