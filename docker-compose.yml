@@ -170,5 +170,34 @@ services:
       MYSQL_PORT: 3306
     depends_on:
       - mysql-db
+      
+  # 9. Admin Service (Node.js)
+  admin-service:
+    container_name: edumatch-admin
+    build:
+      context: ./services/admin-service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8006:8006" # Cổng 8006
+    environment:
+      # Kết nối CSDL Admin riêng (đã tạo trong init.sql)
+      DATABASE_URL: "mysql://user:password@mysql-db:3306/edumatch_admin_db"
+      PORT: 8006
+      # JWT Secret phải giống hệt các service khác để verify token
+      JWT_SECRET: supersecret123456
+      # URL để gọi sang các service khác (Aggregator Pattern)
+      USER_SERVICE_URL: http://user-service:8001
+      OPP_SERVICE_URL: http://opportunity-service:3000
+      APP_SERVICE_URL: http://application-service:4002
+    depends_on:
+      - mysql-db
+      - user-service
+      - opportunity-service
+      - application-service
+    # Tự động tạo bảng cho admin log khi khởi động
+    command: >
+      sh -c "pnpm exec prisma db push --accept-data-loss &&
+             node dist/index.js"
 volumes:
   mysql-data:
