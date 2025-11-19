@@ -1,0 +1,23 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../src/generated/client"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  // Sẽ kết nối đến 'edumatch_admin_db' (đã tạo trong init.sql)
+  url      = env("DATABASE_URL")
+}
+
+// Bảng lưu nhật ký: Ai làm gì, vào lúc nào?
+model AdminLog {
+  id        Int      @id @default(autoincrement())
+  adminId   String   // ID của người thực hiện (lấy từ token)
+  action    String   // Ví dụ: "BLOCK_USER", "VIEW_DASHBOARD"
+  targetId  String?  // ID của đối tượng bị tác động (nếu có)
+  details   String?  @db.Text // Chi tiết thêm (JSON string)
+  createdAt DateTime @default(now())
+
+  @@map("admin_logs")
+}
