@@ -19,4 +19,7 @@ export class ApplicationRepository {
       data: { status: status },
     });
   }
+  async count() {
+    return prisma.application.count();
+  }
 }

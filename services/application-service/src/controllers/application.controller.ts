@@ -44,4 +44,12 @@ export class ApplicationController {
       res.status(500).json({ error: 'Lỗi server: ' + err.message });
     }
   };
+  count = async (req: Request, res: Response) => {
+    try {
+      const count = await this.appService.countApplications();
+      res.json({ count });
+    } catch (err: any) {
+      res.status(500).json({ error: 'Lỗi server: ' + err.message });
+    }
+  };
 }

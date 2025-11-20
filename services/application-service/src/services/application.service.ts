@@ -25,4 +25,7 @@ export class ApplicationService {
     }
     return this.appRepo.updateStatus(id, status as ApplicationStatus);
   }
+  async countApplications() {
+    return this.appRepo.count();
+  }
 }

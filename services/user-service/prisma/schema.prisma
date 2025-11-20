@@ -18,5 +18,6 @@ model User {
   gpa       Float?   @default(0.0)
   major     String?
   skills    String?  // Lưu dạng chuỗi "python,react"
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 }

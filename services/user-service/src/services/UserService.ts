@@ -49,4 +49,21 @@ export class UserService {
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
+async countUsers() {
+    return this.userRepo.count();
+  }
+
+  async getAllUsers(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    return this.userRepo.findAll(skip, limit);
+  }
+
+  async changeStatus(id: string, isActive: boolean) {
+    // Có thể thêm logic kiểm tra: Không cho phép khóa tài khoản Admin khác
+    const user = await this.userRepo.findById(id);
+    if (!user) throw new Error("User không tồn tại");
+    if (user.role === 'admin') throw new Error("Không thể khóa tài khoản Admin");
+
+    return this.userRepo.updateStatus(id, isActive);
+  }
 }

@@ -13,6 +13,9 @@ services:
     volumes:
         - mysql-data:/var/lib/mysql
         - ./services/mysql-init:/docker-entrypoint-initdb.d
+      - mysql-data:/var/lib/mysql
+      # Thêm dòng này để chạy script tạo 3 CSDL
+      - ./services/mysql-init:/docker-entrypoint-initdb.d
 
 
   # 2. User Service
@@ -149,10 +152,13 @@ services:
       - "8005:8005"
     environment:
       DATABASE_URL: mysql+pymysql://user:password@mysql-db:3306/student_profile_db
+      # Kết nối vào DB riêng: edumatch_student_db
+      # URL chuẩn cho SQLAlchemy: mysql+pymysql://user:password@host:port/dbname
+      DATABASE_URL: mysql+pymysql://user:password@mysql-db:3306/edumatch_student_db
       MYSQL_HOST: mysql-db
       MYSQL_USER: user
       MYSQL_PASSWORD: password
-      MYSQL_DB: student_profile_db
+      MYSQL_DB: edumatch_student_db
       MYSQL_PORT: 3306
     depends_on:
       - mysql-db
@@ -186,5 +192,34 @@ services:
     ports:
       - "5003:5003"
 
+      
+  # 9. Admin Service (Node.js)
+  admin-service:
+    container_name: edumatch-admin
+    build:
+      context: ./services/admin-service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8006:8006" # Cổng 8006
+    environment:
+      # Kết nối CSDL Admin riêng (đã tạo trong init.sql)
+      DATABASE_URL: "mysql://user:password@mysql-db:3306/edumatch_admin_db"
+      PORT: 8006
+      # JWT Secret phải giống hệt các service khác để verify token
+      JWT_SECRET: supersecret123456
+      # URL để gọi sang các service khác (Aggregator Pattern)
+      USER_SERVICE_URL: http://user-service:8001
+      OPP_SERVICE_URL: http://opportunity-service:3000
+      APP_SERVICE_URL: http://application-service:4002
+    depends_on:
+      - mysql-db
+      - user-service
+      - opportunity-service
+      - application-service
+    # Tự động tạo bảng cho admin log khi khởi động
+    command: >
+      sh -c "pnpm exec prisma db push --accept-data-loss &&
+             node dist/index.js"
 volumes:
   mysql-data:

@@ -5,7 +5,7 @@ from datetime import date, datetime
 # --- 1. Document Schema  ---
 class DocumentSchema(BaseModel):
     document_id: Optional[int] = None
-    student_id: int = Field(..., description="Foreign Key to Student Profile")
+    student_id: str = Field(..., description="Foreign Key to Student Profile")
     type: str = Field(..., description="Loại tài liệu: Transcript, Certificate, etc.")
     file_url: str
     upload_date: Optional[datetime] = None
@@ -25,10 +25,22 @@ class StudentProfileBase(BaseModel):
     class Config:
         orm_mode = True
 
+# ✅ THÊM CLASS NÀY: Dùng riêng cho việc Create (Input)
+class StudentProfileCreate(StudentProfileBase):
+    # Bắt buộc phải có student_id khi tạo
+    student_id: str = Field(..., description="User ID (UUID) from User Service")
+# ✅ Class này dùng cho Response (Output)
 class StudentProfileSchema(StudentProfileBase):
-    # Các trường để READ 
-    student_id: int = Field(..., description="Primary Key, also FK to User Account")
+    student_id: str
     documents: List[DocumentSchema] = [] 
     
     class Config:
         orm_mode = True
+
+# class StudentProfileSchema(StudentProfileBase):
+#     # Các trường để READ 
+#     student_id: str = Field(..., description="Primary Key")
+#     documents: List[DocumentSchema] = [] 
+    
+#     class Config:
+#         orm_mode = True
