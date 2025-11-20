@@ -35,6 +35,9 @@ importers:
       mysql2:
         specifier: ^3.15.3
         version: 3.15.3
+      sqlalchemy:
+        specifier: ^10.1.1
+        version: 10.1.1
     devDependencies:
       '@types/bcrypt':
         specifier: ^6.0.0
@@ -2422,6 +2425,9 @@ packages:
   source-map@0.6.1:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
+
+  sqlalchemy@10.1.1:
+    resolution: {integrity: sha512-ZpS3it4Eb+5eofOvjGvHdAtkdNTwi3x5v+GYLmG9PV28WV8dG86SgfWpOg65GSTb9KT96TDiP5LUyo2wUUaGQQ==}
 
   sqlstring@2.3.3:
     resolution: {integrity: sha512-qC9iz2FlN7DQl3+wjwn3802RTyjCx7sDvfQEXchwa6CWOx07/WVfh91gBmQ9fahw8snwGEWU3xGzOt4tFyHLxg==}
@@ -5101,6 +5107,8 @@ snapshots:
       source-map: 0.6.1
 
   source-map@0.6.1: {}
+
+  sqlalchemy@10.1.1: {}
 
   sqlstring@2.3.3: {}
 

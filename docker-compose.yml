@@ -16,7 +16,7 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       # Thêm dòng này để chạy script tạo 3 CSDL
-      - ./services/mysql-init:/docker-entrypoint-initdb.d/init.sql
+      - ./services/mysql-init:/docker-entrypoint-initdb.d
 
   # 2. Dịch vụ Backend (User Service) 
   user-service:
@@ -160,13 +160,13 @@ services:
     ports:
       - "8005:8005"
     environment:
-      # Kết nối vào DB riêng: student_profile_db
+      # Kết nối vào DB riêng: edumatch_student_db
       # URL chuẩn cho SQLAlchemy: mysql+pymysql://user:password@host:port/dbname
-      DATABASE_URL: mysql+pymysql://user:password@mysql-db:3306/student_profile_db
+      DATABASE_URL: mysql+pymysql://user:password@mysql-db:3306/edumatch_student_db
       MYSQL_HOST: mysql-db
       MYSQL_USER: user
       MYSQL_PASSWORD: password
-      MYSQL_DB: student_profile_db
+      MYSQL_DB: edumatch_student_db
       MYSQL_PORT: 3306
     depends_on:
       - mysql-db

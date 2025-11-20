@@ -7,7 +7,7 @@ from datetime import datetime
 # Lấy thông tin từ biến môi trường đã thống nhất
 DB_USER = os.getenv("MYSQL_USER", "user")
 DB_PASSWORD = os.getenv("MYSQL_PASSWORD", "password")
-DB_HOST = os.getenv("MYSQL_HOST", "student-profile-db") # DB mới
+DB_HOST = os.getenv("MYSQL_HOST", "mysql-db") 
 DB_PORT = os.getenv("MYSQL_PORT", 3306)
 DB_NAME = os.getenv("MYSQL_DB", "edumatch_student_db")
 
@@ -28,24 +28,10 @@ def get_db():
         db.close()
 
 
-
-# 1. Bảng UserAccount (Chỉ để tham chiếu FK)
-class UserAccount(Base):
-    __tablename__ = 'useraccount'
-    user_id = Column(Integer, primary_key=True, index=True)
-
-class Document(Base):
-    __tablename__ = 'document'
-    document_id = Column(Integer, primary_key=True, index=True)
-    student_id = Column(Integer, ForeignKey('student.student_id')) # Khóa ngoại
-    type = Column(String(50))
-    file_url = Column(String(255))
-    upload_date = Column(DateTime, default=datetime.utcnow)
-    
 # Bảng Student (StudentProfile)
 class Student(Base):
     __tablename__ = 'student'
-    student_id = Column(Integer, ForeignKey('useraccount.user_id'), primary_key=True, index=True)
+    student_id = Column(String(255), primary_key=True, index=True)
     full_name = Column(String(100))
     major = Column(String(100))
     gpa = Column(DECIMAL(3, 2))
@@ -55,6 +41,14 @@ class Student(Base):
     
     # Mối quan hệ với Document (1:N)
     documents = relationship("Document", back_populates="owner")
+
+class Document(Base):
+    __tablename__ = 'document'
+    document_id = Column(Integer, primary_key=True, index=True)
     
-# Thiết lập mối quan hệ còn lại
-Document.owner = relationship("Student", back_populates="documents")
+    # ✅ SỬA: Đổi Integer -> String(255) cho khớp với student_id
+    student_id = Column(String(255), ForeignKey('student.student_id')) 
+    type = Column(String(50))
+    file_url = Column(String(255))
+    upload_date = Column(DateTime, default=datetime.utcnow)
+    owner = relationship("Student", back_populates="documents")
