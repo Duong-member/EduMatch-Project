@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EduMatch Login</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Inter", sans-serif;
+        }
+
+        body {
+            background: #eef2f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            width: 420px;
+            background: white;
+            padding: 40px 45px;
+            border-radius: 14px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.07);
+            text-align: center;
+        }
+
+        h2 {
+            color: #4b41f2;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 15px;
+            border-radius: 8px;
+            border: 1px solid #dcdcdc;
+            font-size: 15px;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #4b41f2;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 13px;
+            background: #4b41f2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .btn:hover {
+            background: #3a33d6;
+        }
+
+        .text-sm {
+            margin-top: 15px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .text-sm a {
+            color: #4b41f2;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .demo {
+            margin-top: 35px;
+            font-size: 13px;
+            color: #999;
+            line-height: 1.55;
+        }
+
+        .demo b {
+            color: #666;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="card">
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Sign in to EduMatch to continue</p>
+
+        <form>
+            <label>Email Address</label>
+            <input type="email" placeholder="student@edu.com" />
+
+            <label>Password</label>
+            <input type="password" placeholder="••••••••" />
+
+            <button class="btn">Sign In</button>
+        </form>
+
+        <p class="text-sm">
+            Don’t have an account?
+            <a href="./register.html">Create Account</a>
+        </p>
+
+        <div class="demo">
+            <b>Demo Accounts:</b> <br>
+            Student: student@edu.com<br>
+            Professor: prof@edu.com<br>
+            Admin: admin@edu.com
+        </div>
+    </div>
+<!-- Dán vào cuối login.html và register.html -->
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+<script>
+document.querySelector('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.querySelector('input[type="email"]').value;
+    const password = document.querySelector('input[type="password"]').value;
+
+    try {
+        const res = await UserAPI.login({ email, password });
+
+        alert("Đăng nhập thành công!");
+
+        // Sau khi login thành công, API ĐÃ tự redirect theo role trong UserAPI.login
+    } catch (err) {
+        alert("Lỗi đăng nhập: " + err.message);
+    }
+});
+</script>
+
+
+</body>
+</html>

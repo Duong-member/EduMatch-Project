@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>EduMatch - Messages</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-body: #f5f7fb;
+      --bg-sidebar: #ffffff;
+      --bg-card: #ffffff;
+      --bg-primary: #5b6bff;
+      --bg-primary-soft: #eef0ff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border-subtle: #e5e7eb;
+      --danger: #ef4444;
+      --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius-lg: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-body);
+      color: var(--text-main);
+    }
+
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar (reuse từ file trước) */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 20px 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4);
+    }
+
+    .brand-name {
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: 0.01em;
+    }
+
+    .nav-section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .nav-item-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .nav-item.active {
+      background: var(--bg-primary-soft);
+      color: var(--bg-primary);
+      font-weight: 600;
+    }
+
+    .nav-item.active .nav-item-icon {
+      background: #ffffff;
+    }
+
+    .nav-item:hover:not(.active) {
+      background: #f3f4ff;
+      color: var(--text-main);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 4px;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: #4b5563;
+    }
+
+    .profile-info-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .profile-info-role {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Main */
+    .main {
+      flex: 1;
+      padding: 24px 40px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-shell {
+      flex: 1;
+      background: #f9fafb;
+      border-radius: 20px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Left: room list */
+    .room-list-panel {
+      width: 270px;
+      border-right: 1px solid var(--border-subtle);
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .room-list-header {
+      padding: 16px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .room-list {
+      list-style: none;
+      padding: 10px 10px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .room-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      color: var(--text-main);
+      border: 1px solid transparent;
+      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .room-item-prefix {
+      font-size: 16px;
+      color: #6b7280;
+    }
+
+    .room-item.active {
+      background: var(--bg-primary-soft);
+      border-color: #4f46e5;
+      box-shadow: 0 8px 18px rgba(79, 70, 229, 0.25);
+      color: #4f46e5;
+      font-weight: 600;
+    }
+
+    .room-item:not(.active):hover {
+      background: #f3f4ff;
+    }
+
+    /* Right: chat area */
+    .chat-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #f9fafb;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border-subtle);
+      background: #ffffff;
+    }
+
+    .chat-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .chat-header-left span.prefix {
+      color: #6b7280;
+    }
+
+    .chat-status {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #ecfdf5;
+      color: #16a34a;
+      font-weight: 500;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 18px 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .msg-bubble {
+      max-width: 420px;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 10px 14px;
+      box-shadow: 0 4px 16px rgba(148, 163, 184, 0.45);
+      border: 1px solid rgba(209, 213, 219, 0.8);
+    }
+
+    .msg-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .msg-text {
+      font-size: 14px;
+    }
+
+    .msg-time {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: right;
+      margin-top: 6px;
+    }
+
+    .chat-footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 14px 20px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper input {
+      border: none;
+      background: transparent;
+      outline: none;
+      width: 100%;
+      font-size: 14px;
+    }
+
+    .btn-send {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: none;
+      outline: none;
+      background: #4f46e5;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(79, 70, 229, 0.45);
+      transition: transform 0.08s ease, box-shadow 0.12s ease, background 0.1s;
+    }
+
+    .btn-send span {
+      font-size: 18px;
+      color: #ffffff;
+    }
+
+    .btn-send:hover {
+      background: #4338ca;
+      transform: translateY(-1px);
+      box-shadow: 0 12px 26px rgba(79, 70, 229, 0.55);
+    }
+
+    .btn-send:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.45);
+    }
+
+    /* Floating scroll buttons (giống file trước) */
+    .scroll-controls {
+      position: fixed;
+      right: 26px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 50;
+    }
+
+    .scroll-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: none;
+      outline: none;
+      background: #111827;
+      opacity: 0.85;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #f9fafb;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.6);
+      transition: opacity 0.15s ease, transform 0.08s ease, box-shadow 0.12s ease;
+    }
+
+    .scroll-btn:hover {
+      opacity: 1;
+      transform: translateY(-1px);
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.7);
+    }
+
+    .scroll-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.6);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .app-shell {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+      }
+
+      .sidebar-main {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .nav-section-title {
+        display: none;
+      }
+
+      .nav-list {
+        flex-direction: row;
+        margin-bottom: 0;
+      }
+
+      .sidebar-footer {
+        border-top: none;
+        margin-top: 0;
+      }
+
+      .profile-info-role {
+        display: none;
+      }
+
+      .main {
+        padding: 18px 12px 24px;
+      }
+
+      .chat-shell {
+        border-radius: 14px;
+      }
+
+      .room-list-panel {
+        width: 230px;
+      }
+
+      .scroll-controls {
+        right: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-main">
+        <div class="brand">
+          <div class="brand-logo">🎓</div>
+          <div class="brand-name">EduMatch</div>
+        </div>
+
+        <div>
+          <div class="nav-section-title">Dashboard</div>
+          <ul class="nav-list">
+  <li>
+    <a href="my-opportunities.html" class="nav-item">
+      <div class="nav-item-icon">📋</div>
+      <span>My Opportunities</span>
+    </a>
+  </li>
+  <li>
+    <a href="applications.html" class="nav-item">
+      <div class="nav-item-icon">📥</div>
+      <span>Applications</span>
+    </a>
+  </li>
+  <li>
+    <a href="messages.html" class="nav-item active">
+      <div class="nav-item-icon">💬</div>
+      <span>Messages</span>
+    </a>
+  </li>
+</ul>
+
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="profile">
+          <div class="avatar">D</div>
+          <div class="profile-info">
+            <div class="profile-info-name">Dr. Smith</div>
+            <div class="profile-info-role">Professor</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="chat-shell">
+        <!-- Left: rooms -->
+        <section class="room-list-panel">
+          <div class="room-list-header">Active Rooms</div>
+          <ul class="room-list" id="roomList">
+            <li class="room-item active" data-room="general">
+              <span class="room-item-prefix">#</span>
+              <span>General</span>
+            </li>
+            <li class="room-item" data-room="research-help">
+              <span class="room-item-prefix">#</span>
+              <span>Research Help</span>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Right: chat -->
+        <section class="chat-panel">
+          <header class="chat-header">
+            <div class="chat-header-left">
+              <span class="prefix">#</span>
+              <span id="chatRoomTitle">general</span>
+            </div>
+            <div class="chat-status">Online</div>
+          </header>
+
+          <div class="chat-body" id="chatMessages">
+            <div class="msg-bubble">
+              <div class="msg-meta">User system</div>
+              <div class="msg-text">Welcome to EduMatch Global Chat!</div>
+              <div class="msg-time">02:43 PM</div>
+            </div>
+          </div>
+
+          <footer class="chat-footer">
+            <div class="input-wrapper">
+              <input type="text" placeholder="Type your message..." />
+            </div>
+            <button class="btn-send" type="button">
+              <span>➤</span>
+            </button>
+          </footer>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scroll controls -->
+  <div class="scroll-controls">
+    <button class="scroll-btn" type="button" id="scrollUp" aria-label="Scroll up">
+      ▲
+    </button>
+    <button class="scroll-btn" type="button" id="scrollDown" aria-label="Scroll down">
+      ▼
+    </button>
+  </div>
+
+  <!-- JS nhẹ, sau này bạn thay bằng logic socket/chat của bạn -->
+  <script>
+    // Scroll buttons
+    document.getElementById("scrollUp").addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    document.getElementById("scrollDown").addEventListener("click", function () {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    });
+
+    // Chuyển active room (chỉ đổi highlight + title, message demo giữ nguyên)
+    document.querySelectorAll(".room-item").forEach(function (item) {
+      item.addEventListener("click", function () {
+        document.querySelectorAll(".room-item").forEach(function (i) {
+          i.classList.remove("active");
+        });
+        item.classList.add("active");
+
+        var roomName = item.querySelector("span:nth-child(2)").textContent.trim();
+        document.getElementById("chatRoomTitle").textContent =
+          item.dataset.room === "general" ? "general" : "research-help";
+        // Sau này bạn load messages theo roomName hoặc item.dataset.room
+      });
+    });
+  </script>
+</body>
+</html>

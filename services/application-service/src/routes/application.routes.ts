@@ -16,6 +16,7 @@ router.post('/', controller.createApplication);
 router.get('/count', controller.count);
 router.get('/:id', controller.getApplication);
 router.put('/:id/status', controller.updateStatus);
+router.get('/', controller.list);
 // (Thêm các routes khác nếu cần, ví dụ: GET /)
 
 export default router

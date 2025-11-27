@@ -1,0 +1,29 @@
+// services/application-service/prisma/schema.prisma
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../src/generated/client"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL") // Sẽ lấy từ docker-compose.yml
+}
+
+model Application {
+  application_id Int               @id @default(autoincrement())
+  student_id     String            @db.VarChar(255)
+  opportunity_id Int
+  status         ApplicationStatus @default(pending)
+  created_at     DateTime?         @default(now())
+  updated_at     DateTime?         @updatedAt
+
+  @@map("applications") // Map với tên bảng 'applications' trong SQL
+}
+
+enum ApplicationStatus {
+  pending
+  approved
+  rejected
+  interview
+}

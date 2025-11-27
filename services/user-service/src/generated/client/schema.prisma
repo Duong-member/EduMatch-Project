@@ -1,0 +1,23 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../src/generated/client"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      String
+  name      String?
+  gpa       Float?   @default(0.0)
+  major     String?
+  skills    String? // Lưu dạng chuỗi "python,react"
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}

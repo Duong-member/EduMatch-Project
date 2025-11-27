@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ Cá nhân - EduMatch Student</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        /* Ẩn input file */
+        .hidden-input { display: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar cho Student -->
+        <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
+            <div class="p-6 flex items-center space-x-2 border-b border-gray-100">
+                <i data-lucide="graduation-cap" class="text-blue-600 w-8 h-8"></i>
+                <span class="text-xl font-bold text-gray-800">EduMatch</span>
+            </div>
+            
+            <!-- Thông tin user tóm tắt -->
+            <div class="p-4 border-b border-gray-100 bg-blue-50/50">
+                <div class="flex items-center space-x-3">
+                    <img id="sidebar-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Avatar" class="w-10 h-10 rounded-full bg-white border object-cover">
+                    <div>
+                        <p class="text-sm font-bold text-gray-800 truncate w-32" id="sidebar-name">Đang tải...</p>
+                        <p class="text-xs text-gray-500">Sinh viên</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CẬP NHẬT NAV ĐỂ LIÊN KẾT CÁC TRANG -->
+            <nav class="flex-1 p-4 space-y-1">
+                <a href="/student-profile.html" class="flex items-center space-x-3 px-4 py-3 text-blue-600 bg-blue-50 rounded-lg font-medium transition">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                    <span>Hồ sơ cá nhân</span>
+                </a>
+                <a href="/student-opportunities.html" class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition">
+                    <i data-lucide="briefcase" class="w-5 h-5"></i>
+                    <span>Cơ hội & Học bổng</span>
+                </a>
+                <a href="/student-messages.html" class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition">
+                    <i data-lucide="message-square" class="w-5 h-5"></i>
+                    <span>Tin nhắn</span>
+                </a>
+            </nav>
+            
+            <div class="p-4 border-t border-gray-100">
+                <button onclick="logout()" class="flex items-center space-x-3 text-gray-600 hover:text-red-600 transition w-full px-4 py-2">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                    <span>Đăng xuất</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50/50">
+            
+            <!-- Header Profile -->
+            <div class="relative mb-8 group/cover">
+                <!-- Cover Image -->
+                <div id="profile-cover" class="h-48 w-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-t-2xl bg-cover bg-center relative transition-all">
+                    <!-- Nút đổi cover (Hiện khi hover) -->
+                    <button onclick="triggerFileInput('cover-upload')" class="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white px-3 py-1.5 rounded-lg text-sm font-medium backdrop-blur-sm flex items-center opacity-0 group-hover/cover:opacity-100 transition duration-300">
+                        <i data-lucide="image" class="w-4 h-4 mr-2"></i> Đổi ảnh bìa
+                    </button>
+                    <input type="file" id="cover-upload" class="hidden-input" accept="image/*" onchange="handleImageUpload(event, 'cover')">
+                </div>
+                
+                <!-- Info Card -->
+                <div class="absolute -bottom-12 left-8 flex items-end space-x-6">
+                    <div class="relative group/avatar">
+                        <img id="profile-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-32 h-32 rounded-full border-4 border-white bg-white shadow-md object-cover">
+                        <!-- Nút đổi avatar -->
+                        <button onclick="triggerFileInput('avatar-upload')" class="absolute bottom-1 right-1 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-700 border-2 border-white transition" title="Đổi ảnh đại diện">
+                            <i data-lucide="camera" class="w-4 h-4"></i>
+                        </button>
+                        <input type="file" id="avatar-upload" class="hidden-input" accept="image/*" onchange="handleImageUpload(event, 'avatar')">
+                    </div>
+                    <div class="mb-2 pb-1">
+                        <h1 class="text-3xl font-bold text-gray-800" id="profile-name">Loading Name...</h1>
+                        <p class="text-blue-600 font-medium flex items-center">
+                            <i data-lucide="map-pin" class="w-4 h-4 mr-1"></i>
+                            <span id="profile-location">Loading...</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="absolute bottom-4 right-8 flex space-x-3">
+                    <button onclick="toggleEditMode()" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium shadow-sm hover:bg-blue-700 flex items-center">
+                        <i data-lucide="pencil" class="w-4 h-4 mr-2"></i> Chỉnh sửa hồ sơ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Layout Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-16">
+                
+                <!-- Left Column: Thông tin cơ bản -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- About -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center">
+                            <i data-lucide="info" class="w-5 h-5 mr-2 text-blue-500"></i> Giới thiệu
+                        </h3>
+                        <p class="text-gray-600 text-sm leading-relaxed" id="profile-bio">
+                            Đang tải thông tin giới thiệu...
+                        </p>
+                        
+                        <div class="mt-6 space-y-3">
+                            <div class="flex items-center text-sm text-gray-600 group">
+                                <i data-lucide="mail" class="w-4 h-4 mr-3 text-gray-400"></i>
+                                <a href="#" id="profile-email" class="hover:text-blue-600 hover:underline truncate">email@example.com</a>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i data-lucide="phone" class="w-4 h-4 mr-3 text-gray-400"></i>
+                                <span id="profile-phone">09xx xxx xxx</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i data-lucide="globe" class="w-4 h-4 mr-3 text-gray-400"></i>
+                                <a href="#" target="_blank" class="text-blue-600 hover:underline truncate" id="profile-website">https://mypage.com</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Skills -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-gray-800 text-lg flex items-center">
+                                <i data-lucide="zap" class="w-5 h-5 mr-2 text-yellow-500"></i> Kỹ năng
+                            </h3>
+                            <button onclick="openSkillModal()" class="text-blue-600 hover:bg-blue-50 p-1 rounded transition" title="Thêm kỹ năng"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                        </div>
+                        <div class="flex flex-wrap gap-2" id="skills-container">
+                            <!-- Skills injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Học vấn & Kinh nghiệm -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- Education -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-gray-800 text-lg flex items-center">
+                                <i data-lucide="book-open" class="w-5 h-5 mr-2 text-blue-600"></i> Học vấn
+                            </h3>
+                            <button onclick="openEducationModal()" class="text-blue-600 hover:bg-blue-50 p-1 rounded transition" title="Thêm học vấn"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                        </div>
+
+                        <div class="space-y-6 relative border-l-2 border-gray-100 ml-3 pl-6 pb-2" id="education-container">
+                            <!-- Education Items -->
+                        </div>
+                    </div>
+
+                    <!-- Documents (CV, Certificates) -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-gray-800 text-lg flex items-center">
+                                <i data-lucide="file-text" class="w-5 h-5 mr-2 text-green-600"></i> Tài liệu & Chứng chỉ
+                            </h3>
+                            <button onclick="openDocumentModal()" class="text-blue-600 hover:bg-blue-50 p-1 rounded transition" title="Thêm tài liệu"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="documents-container">
+                            <!-- Documents injected by JS -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- Modal: Chỉnh sửa thông tin cá nhân (Bao gồm Email) -->
+    <div id="edit-modal" class="fixed inset-0 bg-gray-900/50 hidden items-center justify-center z-50 backdrop-blur-sm transition-opacity">
+        <div class="bg-white w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-800">Chỉnh sửa Hồ sơ cá nhân</h3>
+                <button onclick="toggleEditMode()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto">
+                <form id="profile-form" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+                            <input type="text" id="input-name" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                         <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+                            <input type="text" id="input-phone" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email liên hệ</label>
+                        <input type="email" id="input-email" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Địa chỉ / Thành phố</label>
+                        <input type="text" id="input-location" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Giới thiệu bản thân (Bio)</label>
+                        <textarea id="input-bio" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Website / Portfolio</label>
+                        <input type="text" id="input-website" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </form>
+            </div>
+            <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end space-x-3">
+                <button onclick="toggleEditMode()" class="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg font-medium transition">Hủy</button>
+                <button onclick="saveProfile()" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition shadow-sm">Lưu thay đổi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Thêm Kỹ năng -->
+    <div id="skill-modal" class="fixed inset-0 bg-gray-900/50 hidden items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-sm rounded-xl shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="font-bold text-gray-800">Thêm Kỹ năng mới</h3>
+                <button onclick="closeModal('skill-modal')" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-4">
+                <input type="text" id="input-skill-new" placeholder="Ví dụ: Java, Teamwork..." class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end space-x-2">
+                <button onclick="closeModal('skill-modal')" class="px-3 py-1.5 text-gray-600 hover:bg-gray-200 rounded-lg text-sm font-medium">Hủy</button>
+                <button onclick="saveSkill()" class="px-4 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">Thêm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Thêm/Sửa Học vấn -->
+    <div id="education-modal" class="fixed inset-0 bg-gray-900/50 hidden items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-lg rounded-xl shadow-2xl overflow-hidden">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="font-bold text-gray-800" id="edu-modal-title">Thêm Học vấn</h3>
+                <button onclick="closeModal('education-modal')" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-5 space-y-4">
+                <input type="hidden" id="input-edu-index" value="-1"> 
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Trường / Tổ chức</label>
+                    <input type="text" id="input-edu-school" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bằng cấp / Chứng chỉ</label>
+                        <input type="text" id="input-edu-degree" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">GPA (nếu có)</label>
+                        <input type="text" id="input-edu-gpa" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Thời gian</label>
+                    <input type="text" id="input-edu-period" placeholder="VD: 2020 - 2024" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Mô tả thêm</label>
+                    <textarea id="input-edu-desc" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                </div>
+            </div>
+            <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end space-x-2">
+                <button onclick="closeModal('education-modal')" class="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg text-sm font-medium">Hủy</button>
+                <button onclick="saveEducation()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Thêm/Sửa Tài liệu (Mới) -->
+    <div id="document-modal" class="fixed inset-0 bg-gray-900/50 hidden items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="font-bold text-gray-800" id="doc-modal-title">Thêm Tài liệu</h3>
+                <button onclick="closeModal('document-modal')" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-5 space-y-4">
+                <input type="hidden" id="input-doc-index" value="-1">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tên tài liệu/Chứng chỉ</label>
+                    <input type="text" id="input-doc-name" placeholder="VD: IELTS Certificate..." class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Chi tiết / Điểm số (ngắn gọn)</label>
+                    <input type="text" id="input-doc-date" placeholder="VD: 8.0 Overall - 2024" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Loại file (Mô phỏng)</label>
+                    <select id="input-doc-type" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                        <option value="pdf">PDF Document</option>
+                        <option value="img">Image (JPG/PNG)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end space-x-2">
+                <button onclick="closeModal('document-modal')" class="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg text-sm font-medium">Hủy</button>
+                <button onclick="saveDocument()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Dữ liệu mẫu ---
+        const MOCK_PROFILE = {
+            id: "stu_123",
+            fullName: "Nguyễn Văn A",
+            role: "student",
+            email: "nguyenvana@student.university.edu.vn",
+            phone: "0987 654 321",
+            location: "Thủ Đức, TP. Hồ Chí Minh",
+            bio: "Sinh viên năm cuối chuyên ngành Khoa học Máy tính với đam mê nghiên cứu về Trí tuệ nhân tạo và Học máy. Đang tìm kiếm cơ hội thực tập nghiên cứu và học bổng Tiến sĩ.",
+            website: "https://nguyenvana.dev",
+            avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
+            cover: "", // Để trống sẽ hiện màu gradient
+            skills: ["Python", "Machine Learning", "ReactJS", "Data Analysis", "Academic Writing"],
+            education: [
+                {
+                    school: "Đại học Bách Khoa TP.HCM",
+                    degree: "Kỹ sư Khoa học Máy tính",
+                    gpa: "3.8/4.0",
+                    period: "2020 - 2025 (Dự kiến)",
+                    description: "Chuyên ngành Hệ thống thông tin. Tham gia Lab nghiên cứu AI."
+                },
+                {
+                    school: "THPT Chuyên Lê Hồng Phong",
+                    degree: "Chuyên Toán",
+                    gpa: "9.0/10",
+                    period: "2017 - 2020",
+                    description: "Giải Nhì HSG Quốc gia môn Tin học."
+                }
+            ],
+            documents: [
+                { name: "CV_NguyenVanA_2025.pdf", type: "pdf", date: "Cập nhật 2 ngày trước" },
+                { name: "IELTS_Certificate.jpg", type: "img", date: "8.0 Overall" }
+            ]
+        };
+
+        // --- 1. Render Giao diện ---
+        function loadProfile() {
+            // Header & Basic Info
+            document.getElementById('sidebar-name').innerText = MOCK_PROFILE.fullName;
+            document.getElementById('sidebar-avatar').src = MOCK_PROFILE.avatar;
+            
+            document.getElementById('profile-name').innerText = MOCK_PROFILE.fullName;
+            document.getElementById('profile-avatar').src = MOCK_PROFILE.avatar;
+            document.getElementById('profile-location').innerText = MOCK_PROFILE.location;
+            document.getElementById('profile-bio').innerText = MOCK_PROFILE.bio;
+            
+            // Email Link
+            const emailEl = document.getElementById('profile-email');
+            emailEl.innerText = MOCK_PROFILE.email;
+            emailEl.href = `mailto:${MOCK_PROFILE.email}`;
+
+            document.getElementById('profile-phone').innerText = MOCK_PROFILE.phone;
+            document.getElementById('profile-website').innerText = MOCK_PROFILE.website;
+            document.getElementById('profile-website').href = MOCK_PROFILE.website.startsWith('http') ? MOCK_PROFILE.website : `https://${MOCK_PROFILE.website}`;
+
+            // Cover Logic
+            const coverEl = document.getElementById('profile-cover');
+            if (MOCK_PROFILE.cover) {
+                coverEl.style.backgroundImage = `url('${MOCK_PROFILE.cover}')`;
+                coverEl.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-indigo-600');
+            } else {
+                coverEl.style.backgroundImage = 'none';
+                coverEl.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-indigo-600');
+            }
+
+            // Render Skills
+            const skillsContainer = document.getElementById('skills-container');
+            skillsContainer.innerHTML = MOCK_PROFILE.skills.map((skill, index) => `
+                <div class="group inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium border border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition cursor-default">
+                    ${skill}
+                    <button onclick="deleteSkill(${index})" class="ml-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" title="Xóa kỹ năng"><i data-lucide="x" class="w-3 h-3"></i></button>
+                </div>
+            `).join('');
+
+            // Render Education
+            const eduContainer = document.getElementById('education-container');
+            eduContainer.innerHTML = MOCK_PROFILE.education.map((edu, index) => `
+                <div class="relative group">
+                    <div class="absolute -left-[31px] bg-blue-100 h-8 w-8 rounded-full flex items-center justify-center border-4 border-white">
+                        <i data-lucide="graduation-cap" class="w-4 h-4 text-blue-600"></i>
+                    </div>
+                    <div class="hover:bg-gray-50 p-2 rounded-lg transition -ml-2">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-gray-800">${edu.school}</h4>
+                                <div class="flex items-center text-sm text-gray-500 mb-2">
+                                    <span class="font-medium text-blue-600 mr-2">${edu.degree}</span>
+                                    <span class="w-1 h-1 bg-gray-400 rounded-full mx-2"></span>
+                                    <span>${edu.period}</span>
+                                </div>
+                            </div>
+                            <div class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="openEducationModal(${index})" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-100 rounded" title="Sửa"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                                <button onclick="deleteEducation(${index})" class="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-100 rounded" title="Xóa"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 bg-white p-3 rounded-lg border border-gray-100 group-hover:border-blue-100">
+                            <span class="font-semibold text-gray-700">GPA: ${edu.gpa}</span> <br>
+                            ${edu.description}
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+
+            // Render Documents
+            const docContainer = document.getElementById('documents-container');
+            docContainer.innerHTML = MOCK_PROFILE.documents.map((doc, index) => {
+                const iconClass = doc.type === 'pdf' ? 'text-red-500 bg-red-50' : 'text-blue-500 bg-blue-50';
+                const iconName = doc.type === 'pdf' ? 'file-text' : 'image';
+                
+                return `
+                <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-between hover:border-blue-300 hover:shadow-sm transition cursor-pointer group">
+                    <div class="flex items-center space-x-3" onclick="openDocumentModal(${index})">
+                        <div class="${iconClass} p-2 rounded"><i data-lucide="${iconName}" class="w-6 h-6"></i></div>
+                        <div class="overflow-hidden">
+                            <p class="font-medium text-gray-800 text-sm truncate w-48" title="${doc.name}">${doc.name}</p>
+                            <p class="text-xs text-gray-400">${doc.date}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition">
+                         <button onclick="openDocumentModal(${index})" class="text-gray-300 hover:text-blue-600 p-1" title="Chỉnh sửa"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                         <button onclick="deleteDocument(${index})" class="text-gray-300 hover:text-red-500 p-1" title="Xóa file"><i data-lucide="trash" class="w-4 h-4"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        // --- 2. Xử lý Ảnh (Avatar & Cover) ---
+        function triggerFileInput(id) {
+            document.getElementById(id).click();
+        }
+
+        function handleImageUpload(event, type) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (type === 'avatar') {
+                        MOCK_PROFILE.avatar = e.target.result;
+                    } else if (type === 'cover') {
+                        MOCK_PROFILE.cover = e.target.result;
+                    }
+                    loadProfile(); // Reload UI với ảnh mới
+                    alert("Đã thay đổi ảnh thành công!");
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // --- 3. Chỉnh sửa Hồ sơ (Bao gồm Email) ---
+        function toggleEditMode() {
+            const modal = document.getElementById('edit-modal');
+            const isHidden = modal.classList.contains('hidden');
+            
+            if (isHidden) {
+                document.getElementById('input-name').value = MOCK_PROFILE.fullName;
+                document.getElementById('input-phone').value = MOCK_PROFILE.phone;
+                document.getElementById('input-email').value = MOCK_PROFILE.email; // Thêm Email
+                document.getElementById('input-location').value = MOCK_PROFILE.location;
+                document.getElementById('input-bio').value = MOCK_PROFILE.bio;
+                document.getElementById('input-website').value = MOCK_PROFILE.website;
+                
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function saveProfile() {
+            const btn = document.querySelector('button[onclick="saveProfile()"]');
+            btn.innerText = "Đang lưu...";
+            btn.disabled = true;
+
+            MOCK_PROFILE.fullName = document.getElementById('input-name').value;
+            MOCK_PROFILE.phone = document.getElementById('input-phone').value;
+            MOCK_PROFILE.email = document.getElementById('input-email').value; // Lưu Email
+            MOCK_PROFILE.location = document.getElementById('input-location').value;
+            MOCK_PROFILE.bio = document.getElementById('input-bio').value;
+            MOCK_PROFILE.website = document.getElementById('input-website').value;
+
+            setTimeout(() => {
+                loadProfile();
+                toggleEditMode();
+                btn.innerText = "Lưu thay đổi";
+                btn.disabled = false;
+                alert("Cập nhật thông tin thành công!");
+            }, 500);
+        }
+
+        // --- 4. Quản lý Kỹ năng ---
+        function openSkillModal() {
+            document.getElementById('input-skill-new').value = '';
+            document.getElementById('skill-modal').classList.remove('hidden');
+            document.getElementById('skill-modal').classList.add('flex');
+        }
+
+        function saveSkill() {
+            const val = document.getElementById('input-skill-new').value.trim();
+            if (val) {
+                MOCK_PROFILE.skills.push(val);
+                loadProfile();
+                closeModal('skill-modal');
+            }
+        }
+
+        function deleteSkill(index) {
+            if(confirm('Xóa kỹ năng này?')) {
+                MOCK_PROFILE.skills.splice(index, 1);
+                loadProfile();
+            }
+        }
+
+        // --- 5. Quản lý Học vấn ---
+        function openEducationModal(index = -1) {
+            const modal = document.getElementById('education-modal');
+            const title = document.getElementById('edu-modal-title');
+            document.getElementById('input-edu-index').value = index;
+
+            if (index >= 0) {
+                const data = MOCK_PROFILE.education[index];
+                title.innerText = "Chỉnh sửa Học vấn";
+                document.getElementById('input-edu-school').value = data.school;
+                document.getElementById('input-edu-degree').value = data.degree;
+                document.getElementById('input-edu-gpa').value = data.gpa;
+                document.getElementById('input-edu-period').value = data.period;
+                document.getElementById('input-edu-desc').value = data.description;
+            } else {
+                title.innerText = "Thêm Học vấn Mới";
+                document.getElementById('input-edu-school').value = '';
+                document.getElementById('input-edu-degree').value = '';
+                document.getElementById('input-edu-gpa').value = '';
+                document.getElementById('input-edu-period').value = '';
+                document.getElementById('input-edu-desc').value = '';
+            }
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function saveEducation() {
+            const index = parseInt(document.getElementById('input-edu-index').value);
+            const newEdu = {
+                school: document.getElementById('input-edu-school').value,
+                degree: document.getElementById('input-edu-degree').value,
+                gpa: document.getElementById('input-edu-gpa').value,
+                period: document.getElementById('input-edu-period').value,
+                description: document.getElementById('input-edu-desc').value
+            };
+
+            if (!newEdu.school || !newEdu.degree) {
+                alert("Vui lòng nhập tên trường và bằng cấp");
+                return;
+            }
+
+            if (index >= 0) {
+                MOCK_PROFILE.education[index] = newEdu;
+            } else {
+                MOCK_PROFILE.education.push(newEdu);
+            }
+            loadProfile();
+            closeModal('education-modal');
+        }
+
+        function deleteEducation(index) {
+            if(confirm('Bạn có chắc muốn xóa mục này?')) {
+                MOCK_PROFILE.education.splice(index, 1);
+                loadProfile();
+            }
+        }
+
+        // --- 6. Quản lý Tài liệu (New Modal) ---
+        function openDocumentModal(index = -1) {
+            const modal = document.getElementById('document-modal');
+            const title = document.getElementById('doc-modal-title');
+            document.getElementById('input-doc-index').value = index;
+
+            if (index >= 0) {
+                const data = MOCK_PROFILE.documents[index];
+                title.innerText = "Chỉnh sửa Tài liệu";
+                document.getElementById('input-doc-name').value = data.name;
+                document.getElementById('input-doc-date').value = data.date;
+                document.getElementById('input-doc-type').value = data.type;
+            } else {
+                title.innerText = "Thêm Tài liệu Mới";
+                document.getElementById('input-doc-name').value = '';
+                document.getElementById('input-doc-date').value = '';
+                document.getElementById('input-doc-type').value = 'pdf';
+            }
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function saveDocument() {
+            const index = parseInt(document.getElementById('input-doc-index').value);
+            const newDoc = {
+                name: document.getElementById('input-doc-name').value,
+                date: document.getElementById('input-doc-date').value,
+                type: document.getElementById('input-doc-type').value
+            };
+
+            if (!newDoc.name) { alert("Vui lòng nhập tên tài liệu"); return; }
+
+            if (index >= 0) {
+                MOCK_PROFILE.documents[index] = newDoc;
+            } else {
+                MOCK_PROFILE.documents.push(newDoc);
+            }
+            loadProfile();
+            closeModal('document-modal');
+        }
+
+        function deleteDocument(index) {
+            if(confirm('Bạn muốn xóa tài liệu này?')) {
+                MOCK_PROFILE.documents.splice(index, 1);
+                loadProfile();
+            }
+        }
+
+        // --- Helpers ---
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+
+        function logout() {
+            if(confirm('Bạn muốn đăng xuất?')) {
+                localStorage.removeItem('token');
+                window.location.href = '/';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProfile();
+        });
+
+    </script>
+</body>
+</html>

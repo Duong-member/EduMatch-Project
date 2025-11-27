@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tin nhắn - EduMatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Socket.io Client (Để sẵn sàng tích hợp) -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .message-bubble { max-width: 75%; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Chính (Navigation) -->
+        <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col shrink-0">
+            <div class="p-6 flex items-center space-x-2 border-b border-gray-100">
+                <i data-lucide="graduation-cap" class="text-blue-600 w-8 h-8"></i>
+                <span class="text-xl font-bold text-gray-800">EduMatch</span>
+            </div>
+            <nav class="flex-1 p-4 space-y-1">
+                <a href="/student-profile.html" class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                    <span>Hồ sơ cá nhân</span>
+                </a>
+                <a href="/student-opportunities.html" class="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition">
+                    <i data-lucide="briefcase" class="w-5 h-5"></i>
+                    <span>Cơ hội & Học bổng</span>
+                </a>
+                <a href="/student-messages.html" class="flex items-center space-x-3 px-4 py-3 text-blue-600 bg-blue-50 rounded-lg font-medium transition">
+                    <i data-lucide="message-square" class="w-5 h-5"></i>
+                    <span>Tin nhắn</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Chat Application Container -->
+        <div class="flex flex-1 overflow-hidden bg-white m-4 rounded-xl shadow-sm border border-gray-200">
+            
+            <!-- Rooms List (Bên trái khung chat) -->
+            <div class="w-64 bg-gray-50 border-r border-gray-200 flex flex-col">
+                <div class="p-4 border-b border-gray-200">
+                    <h2 class="font-bold text-gray-700">Active Rooms</h2>
+                </div>
+                <div class="flex-1 overflow-y-auto p-2 space-y-1">
+                    <!-- Room 1 -->
+                    <button onclick="selectRoom('general')" class="w-full text-left px-4 py-3 rounded-lg bg-blue-100 text-blue-700 font-medium flex items-center transition">
+                        <span class="text-lg mr-2">#</span> General
+                    </button>
+                    <!-- Room 2 -->
+                    <button onclick="selectRoom('research-help')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-200 text-gray-600 font-medium flex items-center transition">
+                        <span class="text-lg mr-2">#</span> Research Help
+                    </button>
+                     <!-- DM -->
+                    <div class="mt-4 px-4 text-xs font-bold text-gray-400 uppercase">Direct Messages</div>
+                    <button class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200 text-gray-600 flex items-center mt-1">
+                        <div class="w-6 h-6 rounded-full bg-green-200 flex items-center justify-center text-xs mr-2">DS</div>
+                        Dr. Smith
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Area (Bên phải) -->
+            <div class="flex-1 flex flex-col relative">
+                <!-- Header -->
+                <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-white">
+                    <div class="flex items-center">
+                        <span class="text-xl font-bold text-gray-800 mr-2">#</span>
+                        <h3 class="text-lg font-bold text-gray-800" id="current-room-name">General</h3>
+                    </div>
+                    <div class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-bold flex items-center">
+                        <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span> Online
+                    </div>
+                </div>
+
+                <!-- Messages List -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50">
+                    <!-- System Message -->
+                    <div class="flex flex-col space-y-1">
+                        <div class="flex items-end">
+                            <div class="bg-white border border-gray-200 p-4 rounded-2xl rounded-tl-none shadow-sm message-bubble">
+                                <div class="text-xs font-bold text-gray-400 mb-1">User system</div>
+                                <p class="text-gray-800">Welcome to EduMatch Global Chat! Feel free to ask about scholarships.</p>
+                                <div class="text-[10px] text-right text-gray-400 mt-1">02:43 PM</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Message (Mẫu) -->
+                    <div class="flex flex-col space-y-1 items-end">
+                         <div class="bg-blue-600 text-white p-3 rounded-2xl rounded-tr-none shadow-md message-bubble">
+                            <p>Hello, I am looking for AI research opportunities.</p>
+                            <div class="text-[10px] text-right text-blue-200 mt-1">02:45 PM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="p-4 bg-white border-t border-gray-200">
+                    <form onsubmit="sendMessage(event)" class="flex items-center space-x-2">
+                        <input type="text" id="msg-input" placeholder="Type your message..." 
+                            class="flex-1 border border-gray-300 rounded-full px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
+                        <button type="submit" class="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 shadow-lg transition transform hover:scale-105 flex items-center justify-center">
+                            <i data-lucide="send" class="w-5 h-5 ml-0.5"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Logic Chat Giả Lập ---
+        
+        function selectRoom(roomName) {
+            document.getElementById('current-room-name').innerText = roomName.charAt(0).toUpperCase() + roomName.slice(1);
+            // Clear chat or load history logic here
+            // document.getElementById('chat-messages').innerHTML = ''; 
+        }
+
+        function sendMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('msg-input');
+            const text = input.value.trim();
+            
+            if(!text) return;
+
+            const container = document.getElementById('chat-messages');
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            // 1. Append User Message (Right side)
+            const userMsgHTML = `
+                <div class="flex flex-col space-y-1 items-end animate-fade-in-up">
+                     <div class="bg-blue-600 text-white p-3 rounded-2xl rounded-tr-none shadow-md message-bubble">
+                        <p>${text}</p>
+                        <div class="text-[10px] text-right text-blue-200 mt-1">${time}</div>
+                    </div>
+                </div>`;
+            container.insertAdjacentHTML('beforeend', userMsgHTML);
+            input.value = '';
+            container.scrollTop = container.scrollHeight;
+
+            // 2. Simulate Auto Reply (Left side)
+            setTimeout(() => {
+                const replyHTML = `
+                <div class="flex flex-col space-y-1 animate-fade-in-up">
+                    <div class="flex items-end">
+                         <div class="w-6 h-6 rounded-full bg-gray-300 mr-2 flex-shrink-0"></div>
+                        <div class="bg-white border border-gray-200 p-3 rounded-2xl rounded-tl-none shadow-sm message-bubble">
+                            <div class="text-xs font-bold text-gray-400 mb-1">Bot</div>
+                            <p class="text-gray-800">Thank you for your message. A professor will reply shortly.</p>
+                            <div class="text-[10px] text-right text-gray-400 mt-1">${time}</div>
+                        </div>
+                    </div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', replyHTML);
+                container.scrollTop = container.scrollHeight;
+            }, 1000);
+        }
+
+        // Socket.io logic (Commented out for demo)
+        /*
+        const socket = io('http://localhost:8090', { query: { userId: '123' } });
+        socket.on('connect', () => console.log('Connected'));
+        socket.on('notification', (data) => { alert('New Msg: ' + data.message); });
+        */
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

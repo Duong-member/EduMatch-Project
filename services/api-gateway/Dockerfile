@@ -1,15 +1,13 @@
-# services/api-gateway/Dockerfile
-# Dùng image Nginx (bản nhẹ)
 FROM nginx:1.25-alpine
 
-# Xóa file config mặc định của Nginx
+# Xóa config mặc định
 RUN rm /etc/nginx/conf.d/default.conf
 
-# Copy file config tùy chỉnh của chúng ta vào
+# Copy file config Nginx của dự án
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Mở port 80 (cổng chuẩn của Nginx)
-EXPOSE 80
+# Copy toàn bộ FE (đang nằm ở /fe)
+COPY fe /usr/share/nginx/html
 
-# Lệnh để chạy Nginx
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

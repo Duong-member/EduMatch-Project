@@ -52,4 +52,9 @@ export class ApplicationController {
       res.status(500).json({ error: 'Lỗi server: ' + err.message });
     }
   };
+  list = async (req: Request, res: Response) => {
+  const apps = await this.appService.list();
+  res.json(apps);
+};
+
 }
