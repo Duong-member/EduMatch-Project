@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - EduMatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background-color: #f3f4f6; }
+        .sidebar-active { background-color: #e0e7ff; color: #4338ca; border-right: 3px solid #4338ca; }
+    </style>
+</head>
+<body class="text-gray-800 font-sans">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside class="w-64 bg-white border-r border-gray-200 flex flex-col hidden md:flex">
+            <div class="h-16 flex items-center px-6 border-b border-gray-200">
+                <i data-lucide="shield-check" class="text-indigo-600 w-7 h-7 mr-2"></i>
+                <span class="font-bold text-xl text-gray-800">Admin Portal</span>
+            </div>
+
+            <nav class="flex-1 p-4 space-y-1">
+                <a href="#" onclick="switchView('dashboard', this)" class="nav-item flex items-center space-x-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg font-medium transition">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span>Tổng quan</span>
+                </a>
+
+                <a href="#" onclick="switchView('users', this)" class="nav-item flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-blue-600 rounded-lg font-medium transition">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                    <span>Quản lý người dùng</span>
+                </a>
+
+                <a href="#" onclick="switchView('logs', this)" class="nav-item flex items-center space-x-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-blue-600 rounded-lg font-medium transition">
+                    <i data-lucide="file-text" class="w-5 h-5"></i>
+                    <span>System Logs</span>
+                </a>
+            </nav>>
+
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex items-center mb-4 px-4">
+                    <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold mr-3">
+                        A
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-700" id="admin-name">Admin User</p>
+                        <p class="text-xs text-gray-500">System Administrator</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                    <i data-lucide="log-out" class="w-4 h-4 mr-3"></i>
+                    Sign Out
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 relative">
+    <section id="view-dashboard" class="block animate-fade-in space-y-6">
+    
+    <div class="flex justify-between items-center">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Tổng quan hệ thống</h2>
+            <p class="text-gray-500 text-sm">Cập nhật lần cuối: Vừa xong</p>
+        </div>
+        <div class="space-x-2">
+            <button onclick="alert('Tính năng đang phát triển')" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm transition">
+                <i data-lucide="download" class="w-4 h-4 inline mr-1"></i> Xuất báo cáo
+            </button>
+            <button onclick="alert('Tính năng đang phát triển')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 shadow-sm transition">
+                <i data-lucide="plus" class="w-4 h-4 inline mr-1"></i> Tạo thông báo
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 h-full w-1 bg-blue-500"></div>
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Tổng người dùng</p>
+                    <h3 id="stat-users" class="text-3xl font-bold text-gray-800 mt-2">--</h3>
+                    <p class="text-xs text-green-600 mt-1 flex items-center">
+                        <i data-lucide="trending-up" class="w-3 h-3 mr-1"></i> +12% tháng này
+                    </p>
+                </div>
+                <div class="p-3 rounded-lg bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition">
+                    <i data-lucide="users" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 h-full w-1 bg-purple-500"></div>
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Cơ hội / Học bổng</p>
+                    <h3 id="stat-opps" class="text-3xl font-bold text-gray-800 mt-2">--</h3>
+                    <p class="text-xs text-green-600 mt-1 flex items-center">
+                        <i data-lucide="trending-up" class="w-3 h-3 mr-1"></i> +5 mới hôm nay
+                    </p>
+                </div>
+                <div class="p-3 rounded-lg bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition">
+                    <i data-lucide="briefcase" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 h-full w-1 bg-green-500"></div>
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-gray-500 text-sm font-medium">Đơn ứng tuyển</p>
+                    <h3 id="stat-apps" class="text-3xl font-bold text-gray-800 mt-2">--</h3>
+                    <p class="text-xs text-gray-500 mt-1">Cần duyệt: <span class="font-bold text-orange-500">4</span></p>
+                </div>
+                <div class="p-3 rounded-lg bg-green-50 text-green-600 group-hover:bg-green-600 group-hover:text-white transition">
+                    <i data-lucide="file-check" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-1">
+            <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                <i data-lucide="activity" class="w-5 h-5 mr-2 text-red-500"></i>
+                Trạng thái Service
+            </h3>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-2.5 h-2.5 rounded-full bg-green-500 mr-3 animate-pulse"></div>
+                        <span class="text-sm font-medium text-gray-700">User Service</span>
+                    </div>
+                    <span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">Running</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-2.5 h-2.5 rounded-full bg-green-500 mr-3 animate-pulse"></div>
+                        <span class="text-sm font-medium text-gray-700">Opportunity Service</span>
+                    </div>
+                    <span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">Running</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-2.5 h-2.5 rounded-full bg-yellow-500 mr-3"></div>
+                        <span class="text-sm font-medium text-gray-700">Matching Service</span>
+                    </div>
+                    <span class="text-xs px-2 py-1 bg-yellow-100 text-yellow-700 rounded">High Latency</span>
+                </div>
+                 <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-2.5 h-2.5 rounded-full bg-green-500 mr-3 animate-pulse"></div>
+                        <span class="text-sm font-medium text-gray-700">API Gateway</span>
+                    </div>
+                    <span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">Running</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
+            <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                <i data-lucide="pie-chart" class="w-5 h-5 mr-2 text-indigo-500"></i>
+                Phân bố người dùng
+            </h3>
+            
+            <div class="mt-6">
+                <div class="flex justify-between text-sm mb-1">
+                    <span class="font-medium text-gray-700">Sinh viên</span>
+                    <span class="text-gray-500" id="label-student">70%</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2.5 mb-6">
+                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: 70%"></div>
+                </div>
+
+                <div class="flex justify-between text-sm mb-1">
+                    <span class="font-medium text-gray-700">Giáo sư</span>
+                    <span class="text-gray-500" id="label-prof">25%</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2.5 mb-6">
+                    <div class="bg-purple-600 h-2.5 rounded-full" style="width: 25%"></div>
+                </div>
+
+                <div class="flex justify-between text-sm mb-1">
+                    <span class="font-medium text-gray-700">Admin</span>
+                    <span class="text-gray-500" id="label-admin">5%</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2.5 mb-6">
+                    <div class="bg-gray-800 h-2.5 rounded-full" style="width: 5%"></div>
+                </div>
+            </div>
+            
+            <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <p class="text-xs text-gray-500">
+                    <i data-lucide="info" class="w-3 h-3 inline mr-1"></i>
+                    Tỉ lệ Sinh viên/Giáo sư hiện tại là <strong>2.8</strong>. Hệ thống Matching hoạt động tốt nhất khi tỉ lệ này dưới 5.0.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="font-bold text-gray-800">Thành viên mới đăng ký</h3>
+            <button onclick="switchView('users', document.querySelectorAll('.nav-item')[1])" class="text-indigo-600 text-sm font-medium hover:underline">Xem tất cả</button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-gray-50 text-gray-700 uppercase text-xs">
+                    <tr>
+                        <th class="px-6 py-3">User</th>
+                        <th class="px-6 py-3">Vai trò</th>
+                        <th class="px-6 py-3">Ngày tham gia</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-users-body">
+                    <tr><td colspan="3" class="px-6 py-4 text-center">Đang tải...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+
+    <section id="view-users" class="hidden animate-fade-in">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-gray-800">Danh sách người dùng</h2>
+                <div class="flex gap-2">
+                    <input type="text" placeholder="Tìm kiếm email..." class="border rounded px-3 py-1 text-sm">
+                    <button onclick="fetchData()" class="text-sm text-blue-600 hover:underline">Làm mới</button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-gray-600">
+                    <thead class="bg-gray-50 text-gray-800 uppercase font-semibold">
+                        <tr>
+                            <th class="px-6 py-4">Email / Tên</th>
+                            <th class="px-6 py-4">Vai trò</th>
+                            <th class="px-6 py-4">Trạng thái</th>
+                            <th class="px-6 py-4 text-right">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-table-body" class="divide-y divide-gray-100">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section id="view-logs" class="hidden animate-fade-in">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden p-6">
+            <h2 class="text-lg font-bold text-gray-800 mb-4">Nhật ký hoạt động (System Logs)</h2>
+            <div class="space-y-4" id="logs-container">
+                <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded text-sm">
+                    <i data-lucide="info" class="w-5 h-5 text-blue-500 mt-0.5"></i>
+                    <div>
+                        <p class="font-bold text-gray-800">System Startup</p>
+                        <p class="text-gray-500">Hệ thống khởi động thành công các service.</p>
+                        <span class="text-xs text-gray-400">Vừa xong</span>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3 p-3 bg-red-50 rounded text-sm">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500 mt-0.5"></i>
+                    <div>
+                        <p class="font-bold text-gray-800">Login Failed</p>
+                        <p class="text-gray-500">Phát hiện đăng nhập thất bại từ IP 192.168.1.5</p>
+                        <span class="text-xs text-gray-400">10 phút trước</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Init Icons
+        lucide.createIcons();
+
+        // --- 1. ADMIN GUARD LOGIC ---
+        document.addEventListener("DOMContentLoaded", async () => {
+            const token = localStorage.getItem("token");
+            const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+            // Nếu không có token hoặc role không phải admin -> Đuổi về Login
+            if (!token || user.role !== "admin") {
+                alert("⛔ Quyền truy cập bị từ chối! Bạn phải là Admin.");
+                localStorage.clear(); // Xóa session rác
+                window.location.href = "login.html";
+                return;
+            }
+
+            // Hiển thị tên Admin
+            document.getElementById("admin-name").textContent = user.name;
+
+            // Load dữ liệu Dashboard
+            loadStats();
+            loadUsers();
+        });
+
+        // --- 2. LOAD STATS ---
+        async function loadStats() {
+            // Demo gọi API đếm User
+            try {
+                // Giả sử có API /api/users/count (cần user-service hỗ trợ)
+                // Nếu chưa có, ta dùng API getAll và đếm length tạm thời
+                const res = await fetch('/api/users/', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if(res.ok) {
+                    const users = await res.json();
+                    document.getElementById('stat-users').textContent = users.length || 0;
+                } else {
+                    document.getElementById('stat-users').textContent = "Err";
+                }
+                
+                // Các chỉ số khác tạm thời để static hoặc cần API tương ứng
+                document.getElementById('stat-apps').textContent = "12"; // Mock
+                document.getElementById('stat-opps').textContent = "5";  // Mock
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // --- 3. LOAD USERS TABLE ---
+        async function loadUsers() {
+            const tbody = document.getElementById("user-table-body");
+            try {
+                const res = await fetch('/api/users/', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                
+                if(!res.ok) throw new Error("Failed to fetch users");
+                
+                const users = await res.json();
+                
+                if(users.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center">No users found</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = users.map(u => `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-3 font-medium text-gray-900">${u.name}</td>
+                        <td class="px-6 py-3 text-gray-600">${u.email}</td>
+                        <td class="px-6 py-3">
+                            <span class="px-2 py-1 rounded text-xs font-bold uppercase
+                                ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 
+                                  u.role === 'professor' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}">
+                                ${u.role}
+                            </span>
+                        </td>
+                        <td class="px-6 py-3 text-gray-500">${new Date(u.createdAt || Date.now()).toLocaleDateString()}</td>
+                        <td class="px-6 py-3 text-right">
+                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Active
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">Error loading users</td></tr>`;
+            }
+        }
+// Hàm chuyển đổi View
+function switchView(viewId, navElement) {
+    // 1. Ẩn tất cả các section
+    document.getElementById('view-dashboard').classList.add('hidden');
+    document.getElementById('view-users').classList.add('hidden');
+    document.getElementById('view-logs').classList.add('hidden');
+
+    // 2. Hiện section được chọn
+    document.getElementById(`view-${viewId}`).classList.remove('hidden');
+
+    // 3. Cập nhật trạng thái Active cho Sidebar
+    // Xóa active cũ
+    document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.remove('bg-blue-50', 'text-blue-600');
+        el.classList.add('text-gray-600', 'hover:bg-gray-50');
+    });
+    
+    // Thêm active mới
+    if (navElement) {
+        navElement.classList.remove('text-gray-600', 'hover:bg-gray-50');
+        navElement.classList.add('bg-blue-50', 'text-blue-600');
+    }
+
+    // 4. Load dữ liệu tương ứng nếu cần (Lazy load)
+    if (viewId === 'users') {
+        // Gọi API lấy user nếu chuyển sang tab user
+        fetchData(); 
+    }
+}
+
+// Sửa lại hàm fetchData một chút để chỉ render đúng chỗ
+async function fetchData() {
+    // ... code cũ ...
+    // Chỉ cần gọi renderUsers khi có dữ liệu
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    if(getToken()) {
+        // 1. Load Thống kê
+        callApi('/api/admin/dashboard').then(res => {
+           if(res?.data) {
+               document.getElementById('stat-users').innerText = res.data.totalUsers || 0;
+               document.getElementById('stat-opps').innerText = res.data.totalOpportunities || 0;
+               document.getElementById('stat-apps').innerText = res.data.totalApplications || 0;
+           }
+        });
+
+        // 2. Load "Thành viên mới nhất" (Lấy trang 1, limit 5)
+        callApi('/api/users?page=1&limit=5').then(users => {
+            const tbody = document.getElementById('recent-users-body');
+            if(users && users.length > 0) {
+                tbody.innerHTML = users.map(u => `
+                    <tr class="border-b border-gray-50 hover:bg-gray-50">
+                        <td class="px-6 py-3 font-medium text-gray-900 flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs mr-3">
+                                ${u.name ? u.name[0].toUpperCase() : 'U'}
+                            </div>
+                            ${u.email}
+                        </td>
+                        <td class="px-6 py-3">
+                            <span class="px-2 py-1 rounded text-xs font-bold uppercase
+                                ${u.role === 'admin' ? 'bg-gray-100 text-gray-700' : 
+                                  u.role === 'professor' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">
+                                ${u.role}
+                            </span>
+                        </td>
+                        <td class="px-6 py-3 text-gray-400 text-xs">
+                           ${new Date(u.createdAt || Date.now()).toLocaleDateString('vi-VN')}
+                        </td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="3" class="px-6 py-4 text-center">Không có dữ liệu</td></tr>';
+            }
+        });
+
+        // 3. Load bảng Users đầy đủ (để sẵn cho tab Users)
+        callApi('/api/users?page=1&limit=20').then(res => renderUsers(res));
+    } else {
+        document.getElementById('loading').innerHTML = '...';
+    }
+});
+        // --- 4. LOGOUT ---
+        function logout() {
+            if(confirm("Sign out of Admin Dashboard?")) {
+                localStorage.clear();
+                window.location.href = "login.html";
+            }
+        }
+    </script>
+</body>
+</html>
