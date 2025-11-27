@@ -1,3 +1,4 @@
 // services/application-service/src/db/prisma.ts
-import { PrismaClient } from '../generated/client';
+import { PrismaClient } from '@prisma/client';
+
 export const prisma = new PrismaClient();

@@ -1,3 +1,4 @@
+version: "3.8"
 services:
   # 1. MySQL Database
   mysql-db:
@@ -12,8 +13,14 @@ services:
       - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
-      # Thêm dòng này để chạy script tạo 3 CSDL
-      - ./services/mysql-init:/docker-entrypoint-initdb.d
+      - ./services/mysql-init/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro   # ← ĐÃ CHUẨN
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pDuong18122005!"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   # 2. User Service
   user-service:
@@ -24,15 +31,22 @@ services:
     restart: always
     ports:
       - "8001:8001"
+    expose:
+      - "8001"
     environment:
       DATABASE_URL: "mysql://user:password@mysql-db:3306/edumathdb"
       PORT: 8001
       JWT_SECRET: supersecret123456
     depends_on:
-      - mysql-db
+      mysql-db:
+        condition: service_healthy          # ← CHỜ init.sql CHẠY XONG HOÀN TOÀN
     command: >
-      sh -c "pnpm exec prisma db push --accept-data-loss &&
-             node dist/index.js"
+      sh -c "
+        echo 'Đang chờ MySQL khởi động và chạy init.sql (tạo 6 DB)...';
+        sleep 25;   # ← đủ cho init.sql của bạn (1KB, chạy trong 3-5s)
+        echo 'MySQL đã sẵn sàng 100%! Khởi động user-service...';
+        node dist/index.js
+      "
 
   # 3. Application Service
   application-service:
@@ -51,7 +65,8 @@ services:
       - mysql-db
     command: >
       sh -c "pnpm exec prisma db push --accept-data-loss &&
-             node dist/index.js"
+            node dist/index.js"
+
 
   # 4. Opportunity Service
   opportunity-service:
@@ -101,30 +116,26 @@ services:
 
   # 6. API Gateway
   api-gateway:
+    image: nginx:alpine
     container_name: edumatch-gateway
-    build:
-      context: ./services/api-gateway
-      dockerfile: Dockerfile
     restart: always
     ports:
       - "80:80"
+    volumes:
+      - ./fe:/usr/share/nginx/html:ro
+      - ./services/api-gateway/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - user-service
       - application-service
       - opportunity-service
       - matching-service
 
+
   # 7. Frontend React
-  web-react:
-    container_name: edumatch-web
-    build:
-      context: ./apps/web-react
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - "3000:3000"
-    depends_on:
-      - api-gateway
+  #web-react:
+    #build:
+      #dockerfile: Dockerfile
+    ####- api-gateway
 
   # 8. Notification Service
   notification-service:

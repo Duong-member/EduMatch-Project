@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>EduMatch – Professor Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+
+      body {
+        background: #f5f7fb;
+        color: #111827;
+      }
+
+      .layout {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* SIDEBAR */
+      .sidebar {
+        width: 260px;
+        background: #ffffff;
+        border-right: 1px solid #e5e7eb;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .sidebar-header {
+        padding: 20px 22px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logo-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: #4f46e5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      .logo-text {
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      .nav-section {
+        padding: 18px 10px;
+        flex: 1;
+      }
+
+      .nav-title {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #9ca3af;
+        margin-bottom: 8px;
+        padding: 0 12px;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        font-size: 14px;
+        color: #4b5563;
+        margin-bottom: 6px;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+      }
+
+      .nav-item:hover {
+        background: #eef2ff;
+      }
+
+      .nav-item.active {
+        background: #eef2ff;
+        color: #4f46e5;
+        font-weight: 600;
+      }
+
+      .nav-icon {
+        width: 18px;
+        text-align: center;
+      }
+
+      .sidebar-footer {
+        padding: 12px 18px;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .avatar-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        background: #e0e7ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 600;
+        color: #4f46e5;
+      }
+
+      .prof-info-name {
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .prof-info-role {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      /* MAIN + COMMON */
+      .main {
+        flex: 1;
+        padding: 24px 32px;
+        min-width: 0;
+      }
+
+      .main-header {
+        margin-bottom: 20px;
+      }
+
+      .main-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+
+      .main-sub {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* APPLICATIONS TABLE */
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .table-head-row {
+        background: #f9fafb;
+      }
+
+      .th,
+      .td {
+        padding: 12px 18px;
+        font-size: 13px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .th {
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+        font-weight: 600;
+      }
+
+      .td-student {
+        font-weight: 600;
+        color: #111827;
+      }
+
+      .td-student-sub {
+        font-size: 11px;
+        color: #9ca3af;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 500;
+      }
+
+      .status-pending {
+        background: #e5edff;
+        color: #4f46e5;
+      }
+
+      .match-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 13px;
+        color: #4f46e5;
+        cursor: pointer;
+        text-decoration: none;
+      }
+
+      .match-link:hover {
+        text-decoration: underline;
+      }
+
+      .match-icon {
+        font-size: 14px;
+      }
+
+      .actions-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        justify-content: flex-end;
+      }
+
+      .action-btn {
+        border-radius: 999px;
+        width: 26px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+
+      .action-accept {
+        color: #16a34a;
+      }
+
+      .action-reject {
+        color: #ef4444;
+      }
+
+      /* OPPORTUNITIES (demo) */
+      .oppor-list {
+        padding: 14px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .oppor-item {
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        padding: 10px 12px;
+        background: #f9fafb;
+      }
+
+      .oppor-item-title {
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .oppor-item-sub {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 4px;
+      }
+
+      /* MESSAGES (demo) */
+      .messages-wrapper {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        min-height: 360px;
+      }
+
+      .messages-list {
+        border-right: 1px solid #e5e7eb;
+        padding: 10px;
+        background: #f9fafb;
+      }
+
+      .msg-item {
+        padding: 8px 10px;
+        border-radius: 10px;
+        margin-bottom: 6px;
+        cursor: pointer;
+        font-size: 13px;
+      }
+
+      .msg-item.active,
+      .msg-item:hover {
+        background: #eef2ff;
+      }
+
+      .msg-main {
+        padding: 14px 16px;
+      }
+
+      .msg-main-title {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      .msg-main-content {
+        font-size: 13px;
+        color: #4b5563;
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          flex-direction: column;
+        }
+
+        .sidebar {
+          width: 100%;
+          flex-direction: row;
+          align-items: center;
+          border-right: none;
+          border-bottom: 1px solid #e5e7eb;
+        }
+
+        .sidebar-header {
+          border-bottom: none;
+        }
+
+        .nav-section {
+          padding: 10px;
+        }
+
+        .main {
+          padding: 18px 12px;
+        }
+
+        .th,
+        .td {
+          padding: 10px 12px;
+        }
+
+        .messages-wrapper {
+          grid-template-columns: 1fr;
+        }
+
+        .messages-list {
+          border-right: none;
+          border-bottom: 1px solid #e5e7eb;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo-icon">🎓</div>
+          <div class="logo-text">EduMatch</div>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-title">Professor</div>
+
+          <div class="nav-item" data-view="opportunities">
+            <div class="nav-icon">🧳</div>
+            <span>My Opportunities</span>
+          </div>
+
+          <div class="nav-item active" data-view="applications">
+            <div class="nav-icon">👤</div>
+            <span>Applications</span>
+          </div>
+
+          <div class="nav-item" data-view="messages">
+            <div class="nav-icon">💬</div>
+            <span>Messages</span>
+          </div>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="avatar-circle">D</div>
+          <div>
+            <div class="prof-info-name">Dr. Smith</div>
+            <div class="prof-info-role">Professor</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="main">
+        <!-- APPLICATIONS VIEW (default giống screenshot) -->
+        <section id="view-applications">
+          <div class="main-header">
+            <div class="main-title">Applications Received</div>
+            <div class="main-sub">
+              Review student applications and use AI Matching.
+            </div>
+          </div>
+
+          <div class="card">
+            <table class="table">
+              <thead>
+                <tr class="table-head-row">
+                  <th class="th" style="text-align: left">Student</th>
+                  <th class="th" style="text-align: left">Status</th>
+                  <th class="th" style="text-align: left">AI Match Score</th>
+                  <th class="th" style="text-align: right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="td">
+                    <div class="td-student">Alice Student</div>
+                    <div class="td-student-sub">ID: 1</div>
+                  </td>
+                  <td class="td">
+                    <span class="status-pill status-pending">Pending</span>
+                  </td>
+                  <td class="td">
+                    <span class="match-link">
+                      <span class="match-icon">⚡</span>
+                      <span>Calculate Match</span>
+                    </span>
+                  </td>
+                  <td class="td">
+                    <div class="actions-cell">
+                      <div class="action-btn action-accept">✔</div>
+                      <div class="action-btn action-reject">✘</div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- OPPORTUNITIES VIEW (demo) -->
+        <section id="view-opportunities" class="hidden">
+          <div class="main-header">
+            <div class="main-title">My Opportunities</div>
+            <div class="main-sub">
+              Manage the research positions and scholarships you are offering.
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="oppor-list">
+              <div class="oppor-item">
+                <div class="oppor-item-title">
+                  Undergraduate Research Assistant – AI Lab
+                </div>
+                <div class="oppor-item-sub">
+                  Application deadline: 31/12/2025 · Status: Open
+                </div>
+              </div>
+
+              <div class="oppor-item">
+                <div class="oppor-item-title">
+                  Scholarship – Data Science Honors Program
+                </div>
+                <div class="oppor-item-sub">
+                  Application deadline: 15/01/2026 · Status: Open
+                </div>
+              </div>
+
+              <div class="oppor-item">
+                <div class="oppor-item-title">
+                  Teaching Assistant – Algorithms (Spring)
+                </div>
+                <div class="oppor-item-sub">
+                  Application deadline: 01/02/2026 · Status: Closed
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- MESSAGES VIEW (demo) -->
+        <section id="view-messages" class="hidden">
+          <div class="main-header">
+            <div class="main-title">Messages</div>
+            <div class="main-sub">
+              View conversations with students about their applications and
+              opportunities.
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="messages-wrapper">
+              <div class="messages-list">
+                <div class="msg-item active">
+                  Alice Student – Question about AI Lab position
+                </div>
+                <div class="msg-item">
+                  Bob Nguyen – Clarification on scholarship requirements
+                </div>
+                <div class="msg-item">
+                  Carol Tran – Availability for interview
+                </div>
+              </div>
+
+              <div class="msg-main">
+                <div class="msg-main-title">
+                  Alice Student – Question about AI Lab position
+                </div>
+                <div class="msg-main-content" style="margin-top: 8px">
+                  Hi Professor, I am very interested in the Undergraduate
+                  Research Assistant position in your AI Lab. Could you please
+                  share more details about the expected weekly time commitment
+                  and whether remote work is possible?
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      // giống kiểu t code oppor: click nav -> show/hide view
+      document.addEventListener("DOMContentLoaded", () => {
+        const navItems = document.querySelectorAll(".nav-item");
+        const views = {
+          opportunities: document.getElementById("view-opportunities"),
+          applications: document.getElementById("view-applications"),
+          messages: document.getElementById("view-messages"),
+        };
+
+        function setView(view) {
+          Object.keys(views).forEach((key) => {
+            if (!views[key]) return;
+            views[key].classList.toggle("hidden", key !== view);
+          });
+
+          navItems.forEach((item) => {
+            const v = item.getAttribute("data-view");
+            item.classList.toggle("active", v === view);
+          });
+        }
+
+        navItems.forEach((item) => {
+          item.addEventListener("click", () => {
+            const v = item.getAttribute("data-view");
+            if (v && views[v]) setView(v);
+          });
+        });
+
+        // mặc định đang ở Applications
+        setView("applications");
+      });
+    </script>
+    <script src="js/applications.js"></script>
+  </body>
+</html>

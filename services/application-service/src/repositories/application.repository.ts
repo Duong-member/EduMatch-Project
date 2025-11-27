@@ -1,6 +1,9 @@
 // services/application-service/src/repositories/application.repository.ts
+import { ApplicationStatus } from '@prisma/client';
+
 import { prisma } from '../db/prisma';
-import { ApplicationStatus } from '../generated/client';
+
+
 
 export class ApplicationRepository {
   async create(studentId: string, oppId: number) {
@@ -22,4 +25,14 @@ export class ApplicationRepository {
   async count() {
     return prisma.application.count();
   }
+  async findAll() {
+  return prisma.application.findMany();
+}
+
+async list() {
+  return prisma.application.findMany({
+    orderBy: { created_at: 'desc' }
+  });
+}
+
 }

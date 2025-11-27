@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduMatch - Register</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Inter", sans-serif;
+        }
+
+        body {
+            background: #eef2f7;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            width: 460px;
+            background: white;
+            padding: 40px 45px;
+            border-radius: 14px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        h2 {
+            color: #4b41f2;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #444;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 15px;
+            font-size: 15px;
+            border-radius: 8px;
+            border: 1px solid #dcdcdc;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #4b41f2;
+        }
+
+        .role-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #cfcfcf;
+            background: white;
+            cursor: pointer;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+
+        .role-btn.active {
+            background: #4b41f2;
+            color: white;
+            border-color: #4b41f2;
+        }
+
+        .role-btn:hover {
+            background: #eceaff;
+            border-color: #4b41f2;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 13px;
+            background: #4b41f2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .btn:hover {
+            background: #3a33d6;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .footer a {
+            color: #4b41f2;
+            font-weight: 600;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h2>Create Account</h2>
+        <p class="subtitle">Join the EduMatch community</p>
+
+        <form id="registerForm">
+            <label>Full Name</label>
+            <input id="fullName"type="text" placeholder="Your name" required>
+
+            <label>Email Address</label>
+            <input id="email"type="email" placeholder="you@edu.com" required>
+
+            <label>Password</label>
+            <input id="passWord"type="password" placeholder="•••••••••" required>
+
+            <label>I am a...</label>
+
+            <div class="role-group">
+                <button type="button" class="role-btn active" data-role="student">Student</button>
+                <button type="button" class="role-btn" data-role="professor">Professor</button>
+            </div>
+
+            <input type="hidden" id="roleInput" value="student">
+
+            <button class="btn">Register</button>
+        </form>
+
+        <p class="footer">
+            Already have an account?
+            <a href="./login.html">Sign In</a>
+        </p>
+    </div>
+
+
+    <script>
+        const buttons = document.querySelectorAll(".role-btn");
+        const roleInput = document.getElementById("roleInput");
+
+        buttons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                buttons.forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                roleInput.value = btn.getAttribute("data-role");
+            });
+        });
+    </script>
+<!-- Dán vào cuối login.html và register.html -->
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+
+<script>
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('fullName').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('passWord').value;
+    const role = document.getElementById('roleInput').value;
+
+    try {
+        const res = await UserAPI.register({ name, email, password, role });
+        alert("Đăng ký thành công!");
+        window.location.href = "login.html";
+    } catch (err) {
+        alert("Lỗi: " + err.message);
+    }
+});
+</script>
+
+</body>
+</html>
